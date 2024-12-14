@@ -28,7 +28,7 @@ Below we will see an **Employee File Manager** web app, which allows us to uploa
 The web app does not mention anything about what file types are allowed, and we can drag and drop any file we want, and its name will appear on the upload form, including **.php** files: 
 ![[Attachments (images)/rJWV8DPNyg.png]]
 
-**Identifying Web Framework**
+### Identifying Web Framework
  A **web shell** has to be written in the **same** programming language that runs the **web server**, as it runs platform-specific functions and commands to execute system commands on the back-end server, making web shells non-cross-platform scripts. So, the **first step** would be to identify what language runs the web app.
   
 One easy method to determine what language runs the web app is to visit the **/index.ext** page, where we would swap out **ext** with various common web extensions, like **php**, **asp**, **aspx**, among others, to see whether any of them exist.
@@ -45,16 +45,16 @@ To do so, we will write ```<?php echo "Hello HTB";?>``` to **test.php**, and try
 we get a message saying File successfully uploaded, which means that the web application has **no** file validation whatsoever on the **back-end**. Now, we can click the **Download** button, and the web app will take us to our uploaded file: 
 ![[Attachments (images)/B1zh_PwVke.png]]
 
-### Upload Exploitation
+## Upload Exploitation
 The final step in exploiting this web app is to upload the **malicious** script in the same language as the web app. Once we upload our **malicious** script and visit its link, we should be able to interact with it to take control over the back-end server.
-#### Web Shells
+### Web Shells
 We can find many excellent **web shells** online that provide useful features, like directory traversal or file transfer. One good option for **PHP** is **phpbash**, which provides a terminal-like, semi-interactive **web shell**. Furthermore, SecLists provides a plethora of web shells for different frameworks and languages, which can be found in the **/opt/useful/seclists/Web-Shells** directory in a **PwnBox** (HTB).
 
 We can download any of these web shells for the **language** of our web app, then upload it, and visit the uploaded file to interact with the **web shell**. For example, let's try to upload **phpbash.php** from **phpbash** to our web app:
 ![[Attachments (images)/rkg5bqPVJg.png]]
 This web shell provides a **terminal**-like experience, which makes it very easy to **enumerate** the **back-end** server for further exploitation.
 
-**Writing Custom Web Shell**
+### Writing Custom Web Shell
 
 Although using **web shells** from online resources can provide a great experience, we should also know **how** to write a **simple web shell** manually. This is because we may **not** have access to online tools during some penetration tests.
 
@@ -68,7 +68,7 @@ Web shells are **not** exclusive to **PHP**, and the same applies to other web f
 
 It **must** be noted that **in certain cases, web shells may not work**. This may be due to the web server **preventing** the use of some functions utilized by the web shell (e.g. **system()**), or due to a Web App Firewall, among other reasons. In these cases, we may need to use advanced techniques to **bypass** these security mitigations.
 
-#### Reverse Shell
+### Reverse Shell
 Finally, let's see how we can receive **reverse shells** through the vulnerable upload functionality. We should start by downloading a **reverse shell** script in the language of the web app. One reliable **reverse shell** for **PHP** is the ([pentestmonkey PHP reverse shell](https://github.com/pentestmonkey/php-reverse-shell)). 
 [SecLists](https://github.com/danielmiessler/SecLists/tree/master/Web-Shells) also contains various **reverse shell** scripts, and we can utilize any of them to receive a reverse shell as well.
 
@@ -80,7 +80,7 @@ Next, we can start a **netcat** listener on our machine (with the above **port**
 
 We **successfully** received a connection back from the **back-end** server that hosts the vulnerable web app. The same concept can be used for other web frameworks and languages, with the only **difference** being the reverse shell script we use.
 
-#### Generating Custom Reverse Shell Scripts
+### Generating Custom Reverse Shell Scripts
 Just like web shells, we can also create our own reverse shell scripts. While it is possible to use the same previous **system** function and pass it a **reverse shell** command, this may not always be very reliable, as the command may fail for many reasons.
 
 This is why it is always better to use core web framework functions to connect to our machine. However, this may not be as easy to memorize as a web shell script. Luckily, tools like **msfvenom** can **generate** a **reverse shell** script in many languages and may even attempt to **bypass** certain restrictions in place. We can do so as follows for **PHP**:
@@ -91,7 +91,7 @@ Once our **reverse.php** script is generated, we once again start a **netcat** l
 
 Reverse shells may **not** always work, and we may have to rely on web shells instead. This can be for **several** reasons, like having a **firewall** on the **back-end** network that **prevents** outgoing connections or if the web server **disables** the necessary functions to initiate a connection back to us.
 
-### Bypassing Filters
+## Bypassing Filters
 #### Client-Side Validation
 Many web apps only rely on **front-end JavaScript** code to validate the selected file format before it is uploaded and would **not** upload it if the file is **not** in the required format (e.g., **not** an image).
 
@@ -112,7 +112,7 @@ Any code that runs on the **client-side** is under our control. While the web se
 
 To bypass these protections, we can either **modify the upload request to the back-end server**, or we can **manipulate the front-end code to disable these type validations**.
 
-##### Back-end Request Modification
+### Back-end Request Modification
 Let's start by examining a normal request through **Burp**. When we select an image, we see that it gets **reflected** as our profile image, and when we click on **Upload**, our profile image gets updated and **persists** through refreshes. This indicates that our image was uploaded to the **server**, which is now displaying it back to us: 
 ![[BkVIi9wEJg.png]]
 
@@ -129,7 +129,7 @@ So, let's capture another image upload request, and then modify it accordingly:
 
 As we can see, our upload request went through, and we got **File successfully uploaded** in the response. So, we may now visit our uploaded file and interact with it and gain RCE.
 
-##### Disabling Front-end Validation
+### Disabling Front-end Validation
 Another method to bypass client-side validations is through **manipulating the front-end code**. As these functions are being completely processed within our web browser, we have complete control over them. So, we can **modify** these scripts or **disable** them entirely. Then, we may use the upload functionality to upload any file type without needing to utilize **Burp** to capture and modify our requests.
 
 To start, we can click **[CTRL+SHIFT+C]** to toggle the browser's **Page Inspector**, and then click on the **profile image**, which is where we trigger the file selector for the upload form: 
@@ -155,14 +155,14 @@ With the **checkFile** function removed, we should be able to select our **PHP w
 Once we upload our **web shell** and then refresh the page, we can open Page Inspector, click on the profile image, and we should see the URL of our uploaded web shell:
 ```<img src="/profile_images/shell.php" class="profile-image" id="profile-image">```
 
-#### Blacklist Filters
+### Blacklist Filters
 Previously we saw an example of a web app that only applied type validation controls on the **front-end** (i.e., client-side), which made it trivial to bypass these controls.
 
 If the type validation controls on the **back-end** server were **not** securely coded, an attacker can utilize multiple techniques to **bypass** them and reach **PHP** file uploads.
 
 The example below is similar to the one we saw previously, but it has a blacklist of **disallowed extensions** to prevent uploading web scripts. We will see why using a blacklist of common extensions may **not** be enough.
 
-##### Blacklisting Extensions
+### Blacklisting Extensions
 Let's start with the client-side bypasses we learned in the previous section to upload a **PHP** script to the **back-end** server. We'll **intercept** an image upload request with Burp, replace the file content and filename with our **PHP** script's, and forward the request: 
 ![[HyA79VuNyx.png]]
 
@@ -177,7 +177,7 @@ The validation may check the **file type** or the **file content** for type matc
 The code is taking the file extension (```$extension```) from the uploaded file name (```$fileName```) and then **comparing** it against a **list** of blacklisted extensions (```$blacklist```). However, this validation method has a **major flaw**. It is **not comprehensive**, as many other extensions are not included in this list, which may still be used to execute **PHP** code on the back-end server if uploaded.
 ![[HyZKo4d4Jl.png]]
 
-##### Fuzzing Extensions
+### Fuzzing Extensions
 The web app seems to be testing the file extension, our first step is to fuzz the upload functionality with a list of **potential** extensions and see which of them return the previous error message. Any upload requests that do not return an error message, return a different message, or succeed in uploading the file, may indicate an allowed file extension.
 
 [PayloadsAllTheThings](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Extension%20PHP/extensions.lst) provides lists of extensions for **PHP** and **.NET** web apps. Also [SecLists](https://github.com/danielmiessler/SecLists/blob/master/Discovery/Web-Content/web-extensions.txt) has a list of common Web Extensions.
@@ -190,7 +190,7 @@ We'll keep the file content for this attack, as we are only interested in fuzzin
 
 We can sort the results by **Length**, and we will see that all requests with the **Content-Length** (**193**) passed the extension validation, as they all responded with "File successfully uploaded", and the rest responded with "Extension not allowed".
 
-##### Non-Blacklisted Extensions
+### Non-Blacklisted Extensions
 We can try uploading a file using any of the **allowed extensions** from above, and some of them may allow us to execute **PHP** code.
 
 Let's use the **.phtml** extension, which **PHP** web servers often allow for **code execution** rights. Now we have to change the file name to use the **.phtml** extension and changing the content to that of a **PHP web shell**:
@@ -200,7 +200,7 @@ As we can see, our file seems to have indeed been uploaded:
 ![[rJaFaE_NJx.png]]
 
 
-#### Whitelist Filters
+### Whitelist Filters
 The other type of **file extension validation** is by utilizing a whitelist of allowed file extensions. The web server would only allow the specified extensions, and the list would not need to be comprehensive in covering uncommon extensions.
 
 Still, there are different use cases for a blacklist and for a whitelist. A blacklist may be helpful in cases where the upload functionality needs to allow a wide variety of file types (e.g., **File Manager**), while a whitelist is usually only used with upload functionalities where only a few file types are allowed. Both may also be used in tandem.
@@ -220,7 +220,7 @@ We see that the script uses a Regular Expression (**regex**) to test whether the
 
 So, let's see in Double Extensions chapter, how we can bypass these tests to upload **PHP** scripts.
 
-##### Double Extensions
+### Double Extensions
 The code only tests whether the file name **contains** an image extension; a straightforward method of passing the regex test is through Double Extensions. For example, if the **.jpg** extension was allowed, we can add it in our uploaded file name and still end our filename with **.php** (e.g. **shell.jpg.php**), in which case we should be able to **pass** the whitelist test, while still uploading a **PHP** script that can execute **PHP** code.
 
 Let's intercept a request and modify the file name to (**shell.jpg.php**), and modify its content to that of a web shell: 
@@ -234,7 +234,7 @@ However, this may **not** always work, as some web apps may use a **strict regex
 
 This pattern only considers the final file extension, as it uses (**^.*\.**) to match everything up to the last (**.**), and then uses (```$```) at the end to only match extensions that end the file name. So, the **above attack would not work**. Nevertheless, some exploitation techniques **may** allow us to bypass this pattern, but most rely on misconfigurations or outdated systems.
 
-##### Reverse Double Extension
+### Reverse Double Extension
 In some cases, the **file upload functionality** itself may not be vulnerable, but the **web server configuration** may lead to a vulnerability. For example, an organization may use an open-source web app, which has a file upload functionality. Even if the file upload functionality uses a **strict regex** pattern that only matches **the final extension** in the file name, the organization may use the insecure configurations for the web server.
 
 For example, the **/etc/apache2/mods-enabled/php7.4.conf** for the **Apache2 web server** may include the following configuration:
@@ -247,7 +247,7 @@ Let's try to intercept a normal image upload request, and use the above file nam
 Now, we can visit the uploaded file, and attempt to execute a command: 
 ![[BJipMKuVJe.png]]
 
-##### Character Injection
+### Character Injection
 We can inject several characters before or after the **final extension** to cause the web app to **misinterpret** the filename and execute the uploaded file as a **PHP** script.
 The following are some of the characters we may try injecting:
 ![[S1BbQtu41l.png]]
@@ -268,14 +268,14 @@ done
 
 With this custom wordlist, we can run a **fuzzing** scan with Burp Intruder, similar to the ones we did earlier. If either the back-end or the web server is **outdated** or has certain **misconfigurations**, some of the generated filenames may bypass the whitelist test and execute **PHP** code.
 
-#### Type Filters
+### Type Filters
 So far, we have only been dealing with **type filters** that only consider the **file extension** in the file name. However, as we saw in the previous section, we may still be able to gain control over the back-end server even with image extensions (e.g. **shell.php.jpg**). Furthermore, we may utilize some allowed extensions (e.g., **SVG**) to perform **other attacks**.
 
 This is why many modern web servers and web apps also test the **content** of the uploaded file to ensure it matches the specified type. While **extension filters** may accept several extensions, content filters usually specify a single category (e.g., **images, videos, documents**), which is why they do not typically use blacklists or whitelists. This is because web servers provide functions to check for the **file content type**, and it usually falls under a specific category.
 
 There are **two** common methods for validating the file content: **Content-Type Header** or **File Content**. Let's see how we can identify each filter and how to bypass both of them.
 
-##### Content-Type
+#### Content-Type
 Let's start and attempt to upload a PHP script:
 ![[SypLQqdNkg.png]]
 
@@ -304,7 +304,7 @@ This time we get "**File successfully uploaded**", and if we visit our file, we 
 ![[HyGAH5O4yg.png]]
 ![[H1iCHc_Eye.png]]
 
-##### MIME-Type
+#### MIME-Type
 The second and more common type of **file content validation** is testing the uploaded file's **MIME-Type**. **Multipurpose Internet Mail Extensions (MIME)** is an internet standard that determines the type of a file through its **general format** and **bytes structure**.
 
 This is usually done by inspecting the **first few bytes** of the file's content, which contain the **File Signature** or **Magic Bytes**. For example, if a file starts with (**GIF87a** or **GIF89a**), this indicates that it is a **GIF** image, while a file starting with **plaintext** is usually considered a **Text file**. If we change the first bytes of any file to the **GIF magic bytes**, its **MIME** type would be changed to a **GIF** image, regardless of its remaining content or extension.
@@ -385,11 +385,7 @@ Once the **SVG** image is displayed, we should get the base64 encoded content of
 Using **XML** data is **not** unique to **SVG** images, as it is also utilized by many types of documents, like **PDF, Word Documents, PowerPoint Documents, among many others**. All of these documents include **XML** data within them to specify their format and structure. Suppose a web app used a **document viewer** that is vulnerable to **XXE** and allowed uploading any of these documents. In that case, we may also modify their **XML** data to include the **malicious XXE elements**, and we would be able to carry a **blind XXE attack** on the back-end web server.
 
 Another similar attack that is also achievable through these file types is an **SSRF** attack. We may utilize the **XXE** vulnerability to enumerate the internally available services or even call private APIs to perform private actions.
-
-
-
-
-#### Other Notable Attacks 
+### Other Notable Attacks 
 There are a few other techniques and attacks worth mentioning, as they may become handy in some web penetration tests or bug bounty tests.
 ##### Injections in File Name
 A common file upload attack uses a malicious string for the uploaded file name, which may get executed or processed if the uploaded file name is displayed (i.e., **reflected**) on the page. We can try **injecting a command** in the file name, and if the web app uses the file name within an **OS command**, it may lead to a **command injection attack**.

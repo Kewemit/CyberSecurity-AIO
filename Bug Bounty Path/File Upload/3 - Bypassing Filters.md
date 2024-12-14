@@ -1,4 +1,3 @@
-# Bypassing Filters
 ## Client-Side Validation
 Many web apps only rely on **front-end JavaScript** code to validate the selected file format before it is uploaded and would **not** upload it if the file is **not** in the required format (e.g., **not** an image).
 
@@ -175,14 +174,14 @@ done
 
 With this custom wordlist, we can run a **fuzzing** scan with Burp Intruder, similar to the ones we did earlier. If either the back-end or the web server is **outdated** or has certain **misconfigurations**, some of the generated filenames may bypass the whitelist test and execute **PHP** code.
 
-#### Type Filters
+## Type Filters
 So far, we have only been dealing with **type filters** that only consider the **file extension** in the file name. However, as we saw in the previous section, we may still be able to gain control over the back-end server even with image extensions (e.g. **shell.php.jpg**). Furthermore, we may utilize some allowed extensions (e.g., **SVG**) to perform **other attacks**.
 
 This is why many modern web servers and web apps also test the **content** of the uploaded file to ensure it matches the specified type. While **extension filters** may accept several extensions, content filters usually specify a single category (e.g., **images, videos, documents**), which is why they do not typically use blacklists or whitelists. This is because web servers provide functions to check for the **file content type**, and it usually falls under a specific category.
 
 There are **two** common methods for validating the file content: **Content-Type Header** or **File Content**. Let's see how we can identify each filter and how to bypass both of them.
 
-##### Content-Type
+## Content-Type
 Let's start and attempt to upload a PHP script:
 ![[SypLQqdNkg.png]]
 
@@ -211,7 +210,7 @@ This time we get "**File successfully uploaded**", and if we visit our file, we 
 ![[HyGAH5O4yg.png]]
 ![[H1iCHc_Eye.png]]
 
-##### MIME-Type
+## MIME-Type
 The second and more common type of **file content validation** is testing the uploaded file's **MIME-Type**. **Multipurpose Internet Mail Extensions (MIME)** is an internet standard that determines the type of a file through its **general format** and **bytes structure**.
 
 This is usually done by inspecting the **first few bytes** of the file's content, which contain the **File Signature** or **Magic Bytes**. For example, if a file starts with (**GIF87a** or **GIF89a**), this indicates that it is a **GIF** image, while a file starting with **plaintext** is usually considered a **Text file**. If we change the first bytes of any file to the **GIF magic bytes**, its **MIME** type would be changed to a **GIF** image, regardless of its remaining content or extension.

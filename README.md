@@ -9,7 +9,12 @@ I made this repository to document my journey and provide useful information I c
 - Serve as my knowledge base.
 - Possibly help others learn and understand some concepts.
 ## 🚀 Getting Started
-todo later
+
+1. Download the .git
+2. Open Obsidian and press on `manage vaults` from the bottom left:
+![[Pasted image 20241215232702.png]]
+
+
 ## 📖 What’s Inside?
 
 - **Cheatsheets/TLDR**: Quick, handy commands and tools for various stages of penetration testing.

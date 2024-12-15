@@ -12,9 +12,8 @@ I made this repository to document my journey and provide useful information I c
 todo later
 ## 📖 What’s Inside?
 
-- **Cheatsheets**: Quick, handy commands and tools for various stages of penetration testing.
+- **Cheatsheets/TLDR**: Quick, handy commands and tools for various stages of penetration testing.
 - **Thorough Notes**: In-depth explanations of methodologies, tools, and attack techniques.
-- **References**: Links to articles, tools, and other educational resources.
 - **Code Snippets**: Scripts and commands.
 ### Topics Covered:
 - Recon & Enumeration ♻️

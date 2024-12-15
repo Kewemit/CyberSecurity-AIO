@@ -22,7 +22,12 @@
    * Use PowerShell with embedded C# code to dynamically call Windows API functions.
    * Insert generated shellcode into the script as hex-encoded byte array
    * Allocate memory with `VirtualAlloc`, copy shellcode, create a new thread to execute the shellcode and wait for completion.
-3. Depoly 
+3. **Deploy Script:** 
+   * Paste the script into PowerShell on target machine
+   * Execute step by step to avoid detection
+4. Establish Reverse Shell:
+   * On the attacker's machine use `nc -nvlp 1111` to listen for the connection.
+   * After executing PowerShell script on target, gain shell access
 # Deepened:
 ## Essential Terminologies
 - **Shellcode**: A piece of code usually used by malicious actors during exploits like **buffer overflow** attacks to inject commands into a vulnerable system, often leading to executing arbitrary commands or giving attackers control over a compromised machine. Shellcode is typically written in assembly language and delivered through various techniques, depending on the exploited vulnerability.

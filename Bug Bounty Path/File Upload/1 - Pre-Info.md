@@ -12,5 +12,5 @@ The most common and **critical** attack caused by arbitrary file uploads is **ga
 In some cases, we may not have arbitrary file uploads and may only be able to upload a specific file type. Even in these cases, there are various attacks we may be able to perform to exploit the file upload functionality if certain security protections were missing from the web application.
 
 Examples of these attacks include:
-![[Attachments (images)/BydrrwD4yl.png]]
+![[BydrrwD4yl 1.png]]
 Finally, a **file upload vulnerability** is not only caused by **writing insecure functions** but is also often caused by the use of **outdated libraries** that may be vulnerable to these attacks.

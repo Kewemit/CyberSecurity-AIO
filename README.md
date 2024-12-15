@@ -1,5 +1,5 @@
 # Penetration Testing Cheat Sheet
-This project is a collection of my detailed notes, cheat sheets, and references, all focused on penetration testing and related cybersecurity concepts.
+This Obsidian project is a collection of my detailed notes, cheat sheets, and references, all focused on penetration testing and related cybersecurity concepts.
 
 This list Contains my complete cheat sheet gathered from THM, HTB and various other resources
 
@@ -10,11 +10,14 @@ I made this repository to document my journey and provide useful information I c
 - Possibly help others learn and understand some concepts.
 ## 🚀 Getting Started
 
-1. Download the .git
-2. Open Obsidian and press on `manage vaults` from the bottom left:
-![[Pasted image 20241215232702.png]]
+1. Clone the repository using the following command:
+	`git clone https://github.com/Kewemit/pentest.git`
+2. Open **Obsidian** and press on `manage vaults` from the bottom left:
+	 ![[Pasted image 20241215233037.png]]
 
-
+3. Then on that menu press on ``Open folder as vault``:
+	![[Pasted image 20241215232823.png]]
+4. Navigate to the downloaded folder and select it.
 ## 📖 What’s Inside?
 
 - **Cheatsheets/TLDR**: Quick, handy commands and tools for various stages of penetration testing.

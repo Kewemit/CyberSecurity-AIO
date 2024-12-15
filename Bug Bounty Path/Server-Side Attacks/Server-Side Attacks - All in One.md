@@ -48,7 +48,7 @@ In a `netcat` listener, we can receive a connection, thus confirming **SSRF**:
 
 To determine whether the **HTTP** response reflects the **SSRF** response to us, let us point the web application to itself by providing the **URL** `http://127.0.0.1/index.php`:
 ![[Pasted image 20241215182349.png]]Since the response contains the web application's **HTML** code, the **SSRF** vulnerability is not blind, (i.e., the response is displayed to us).
-### Enumerating the System
+## Enumerating the System
 We can use the **SSRF** vulnerability to conduct a port scan of the system to enumerate running services. To achieve this, we need to be able to infer whether a port is open or not from the response to our **SSRF** payload. If we supply a port that we assume is closed (such as `81`), the response contains an error message:
 ![[Pasted image 20241215182514.png]]
 This allows us to conduct an internal port scan of the web server through the **SSRF** vulnerability. We can do this using a fuzzer like `ffuf`. Let us first create a wordlist of the ports we want to scan. In this case, we'll use the first 10,000 ports:
@@ -84,3 +84,24 @@ ffuf -w ./ports.txt -u http://172.17.0.2/index.php -X POST -H "Content-Type: app
 
 The results show that the web server runs a service on port `3306`, typically used for a **SQL** database. If the web server ran other internal services, such as internal web applications, we could also identify and access them through the **SSRF** vulnerability.
 ## Exploiting SSRF
+### Accessing Restricted Endpoints
+The web application fetches availability information from the **URL** `dateserver.htb`. However, when we add this domain to our **hosts** file and attempt to access it, we are unable to do so:
+![[Pasted image 20241216002352.png]]
+
+However, we can access and enumerate the domain through the **SSRF** vulnerability. For instance, we can conduct a **directory brute-force** attack to enumerate additional endpoints using `ffuf`. To do so, let us first determine the web server's response when we access a non-existing page:
+![[Pasted image 20241216002434.png]]
+The web server responds with the default Apache **404** response. To also filter out any **HTTP 403** responses, we will filter our results based on the string `Server at dateserver.htb Port 80`, which is contained in default Apache error pages. Since the web application runs **PHP**, we will specify the `.php` extension:
+```bash
+ffuf -w /opt/SecLists/Discovery/Web-Content/raft-small-words.txt -u http://172.17.0.2/index.php -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "dateserver=http://dateserver.htb/FUZZ.php&date=2024-01-01" -fr "Server at dateserver.htb Port 80"
+```
+
+> [!NOTE]
+>  If you want to know the explanation of this code look at [[#Enumerating the System]].
+
+The response should look something like:
+```shell
+[Status: 200, Size: 361, Words: 55, Lines: 16, Duration: 3872ms]
+    * FUZZ: admin
+[Status: 200, Size: 11, Words: 1, Lines: 1, Duration: 6ms]
+    * FUZZ: availability
+```

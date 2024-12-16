@@ -591,7 +591,7 @@ Here are all fruits of medium size ordered by their color:
 As the name suggests, **XSLT injection** occurs whenever user input is inserted into **XSL** data before output generation by the **XSLT processor**.
 This enables an attacker to inject additional **XSL elements** into the **XSL** data, which the **XSLT** processor will execute during output generation.
 ## Exploiting XSLT Injection
-## Identifying XSLT Injection
+### Identifying XSLT Injection
 Our sample web app displays basic information about some **Academy modules**:
 ![[Pasted image 20241216193256.png]]
 At the bottom of the page, we can provide a **username** that is inserted into the **headline** at the top of the list:
@@ -602,7 +602,7 @@ In that case, it might suffer from **XSLT injection** if our name is inserted wi
 To confirm that, let us try to inject a **broken XML tag** to try to provoke an error in the web app. We can achieve this by providing the username `<`:
 ![[Pasted image 20241216193456.png]]
 As we can see, the web application responds with a server error. While this does not confirm that an **XSLT injection** vulnerability is present, it might indicate the presence of a security issue.
-## Information Disclosure
+### Information Disclosure
 We can try to infer some basic information about the **XSLT processor** in use by injecting the following **XSLT elements**:
 ```xml
 Version: <xsl:value-of select="system-property('xsl:version')" />
@@ -619,7 +619,7 @@ The web app provides the following response:
 ![[Pasted image 20241216193921.png]]
 Since the web application interpreted the **XSLT elements** we provided, this confirms an **XSLT injection** vulnerability.
 Furthermore, we can deduce that the web app seems to rely on the `libxslt` library and supports **XSLT** version `1.0`.
-## Local File Inclusion (LFI)
+### Local File Inclusion (LFI)
 We can try to use multiple different functions to read a local file. Whether a payload will work depends on the **XSLT version** and the configuration of the **XSLT library**. 
 For instance, **XSLT** contains a function `unparsed-text` that can be used to read a local file:
 ```xml
@@ -632,4 +632,22 @@ However, if the **XSLT** library is configured to support **PHP** functions, we 
 ```
 Our sample web app is configured to support **PHP** functions. As such, the local file is displayed in the response:
 ![[Pasted image 20241216194137.png]]
-## Remote Code Execution (RCE)
+### Remote Code Execution (RCE)
+If an **XSLT** processor supports **PHP** functions, we can call a **PHP** function that executes a local system command to obtain **RCE**. 
+For instance, we can call the **PHP** function `system` to execute a command:
+```xml
+<xsl:value-of select="php:function('system','id')" />
+```
+![[Pasted image 20241216194221.png]]
+## Preventing XSLT Injection
+**XSLT injection** can be prevented by ensuring that user input is **not** inserted into **XSL data** before processing by the **XSLT processor**. 
+However, if the output should reflect values provided by the user, user-provided data might be required to be added to the **XSL document** before processing. In this case, it is essential to implement proper sanitization and input validation to avoid **XSLT injection**. 
+This may prevent attackers from injecting additional **XSLT elements**, but the implementation may depend on the output format.
+
+For instance, if the **XSLT processor** generates an **HTML** response, **HTML-encoding** user input before inserting it into the **XSL** data can prevent **XSLT injection**. As **HTML-encoding** converts all instances of `<` to `&lt;` and `>` to `&gt;`, an attacker should not be able to inject additional **XSLT elements**, thus preventing **XSLT injection**.
+
+Additional hardening measures such as:
+1. Running the XSLT processor as a low-privilege process 
+2. Preventing the use of external functions by turning off PHP functions within XSLT 
+3. Keeping the XSLT library up-to-date
+can mitigate the impact of potential **XSLT injection** vulnerabilities.

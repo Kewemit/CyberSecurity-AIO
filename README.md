@@ -17,10 +17,13 @@ I made this repository to document my journey and provide useful information I c
 1. Clone the repository using the following command:
 	`git clone https://github.com/Kewemit/pentest.git`
 2. Open **Obsidian** and press on `manage vaults` from the bottom left:
-	 ![[Pasted image 20241215233037.png]]
+
+	 ![Pasted image 20241215233037](https://github.com/user-attachments/assets/22d93b76-eb93-4bbd-b983-3228eba49048)
+
 
 3. Then on that menu press on ``Open folder as vault``:
-	![[Pasted image 20241215232823.png]]
+	![Pasted image 20241215232823](https://github.com/user-attachments/assets/93f6815c-4057-4306-898e-c116994310f3)
+]
 4. Navigate to the downloaded folder and select it.
 ## 📖 What’s Inside?
 

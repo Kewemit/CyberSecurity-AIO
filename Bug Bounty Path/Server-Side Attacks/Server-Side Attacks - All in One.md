@@ -477,5 +477,159 @@ This directive **prints environment variables**. It does not take any variables.
 #### config
 This directive changes the **SSI configuration** by specifying corresponding parameters. For instance, it can be used to change the error message using the `errmsg` parameter:
 ```SSI
->
+<!--#config errmsg="Error!" -->
 ```
+#### echo
+This directive **prints** the value of any variable given in the `var` parameter. Multiple variables can be printed by specifying multiple `var` parameters. For instance, the following variables are supported:
+```SSI
+<!--#echo var="DOCUMENT_NAME" var="DATE_LOCAL" -->
+```
+#### exec
+This directive executes the command given in the `cmd` parameter:
+```SSI
+<!--#exec cmd="whoami" -->
+```
+#### include
+This directive includes the file specified in the `virtual` parameter. It only allows for the inclusion of files in the **web root directory**:
+```SSI
+<!--#include virtual="index.html" -->
+```
+### SSI Injection
+Occurs when an attacker can inject **SSI directives** into a file that is subsequently served by the web server, resulting in the **execution** of the injected **SSI directives**. For instance, when the web app contains a **vulnerable file upload vulnerability** that enables an attacker to upload a file containing malicious **SSI directives** into the web root directory. Additionally, attackers might be able to inject **SSI directives** if a web app writes user input to a file in the web root directory.
+## Exploiting SSI Injection
+Let's take a look at a sample web app. We are greeted by a simple form asking for our name:
+![[Pasted image 20241216191635.png]]
+If we enter our **name**, we are redirected to `/page.shtml`, which displays some general information:
+![[Pasted image 20241216191701.png]]
+We can guess that the page supports **SSI** based on the **file extension**. If our username is inserted into the page without prior sanitization, it might be vulnerable to **SSI** injection. Let us confirm this by providing a username of `<!--#printenv -->`. This results in the following page:
+![[Pasted image 20241216191741.png]]
+As we can see, the directive **is executed**, and the environment variables are printed. Thus, we have successfully confirmed an **SSI** injection vulnerability. Let us confirm that we can execute arbitrary commands using the `exec` directive by providing the following username: `<!--#exec cmd="id" -->`:
+![[Pasted image 20241216191813.png]]
+The server successfully executed our injected command. This enables us to take over the web server fully.
+## Preventing SSI
+SSI injection can result in devastating consequences, including **remote code execution** and, thus, takeover of the web server.
+
+As with any injection vulnerability, developers must carefully **validate and sanitize user input** to prevent **SSI injection**. This is particularly important when the user input is used within **SSI directives** or **written to files that may contain SSI directives** according to the web server configuration. 
+Additionally, it is vital to configure the webserver to restrict the use of **SSI** to particular file extensions and potentially even particular directories. On top of that, the capabilities of specific **SSI** directives can be limited to help mitigate the impact of **SSI** injection vulnerabilities. For instance, it might be possible to turn off the `exec` directive if it is not actively required.
+# XSLT
+## Introduction to XSLT 
+[eXtensible Stylesheet Language Transformation](https://www.w3.org/TR/xslt-30/) is a language enabling the transformation of **XML** documents. For instance, it can select specific nodes from an **XML** document and change the **XML** structure.
+
+Since **XSLT** operates on **XML-based** data, we will consider the following sample **XML** document to explore how **XSLT** operates:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<fruits>
+    <fruit>
+        <name>Apple</name>
+        <color>Red</color>
+        <size>Medium</size>
+    </fruit>
+    <fruit>
+        <name>Banana</name>
+        <color>Yellow</color>
+        <size>Medium</size>
+    </fruit>
+    <fruit>
+        <name>Strawberry</name>
+        <color>Red</color>
+        <size>Small</size>
+    </fruit>
+</fruits>
+```
+
+**XSLT** can be used to define a data format which is subsequently enriched with data from the **XML** document. **XSLT** data is structured similarly to **XML**. However, it contains **XSL** elements within nodes prefixed with the `xsl`-prefix. The following are some commonly used **XSL** elements:
+- `<xsl:template>`: This element indicates an XSL template. It can contain a `match` attribute that contains a path in the XML document that the template applies to
+- `<xsl:value-of>`: This element extracts the value of the XML node specified in the `select` attribute
+- `<xsl:for-each>`: This element enables looping over all XML nodes specified in the `select` attribute
+For instance, a simple **XSLT** document used to output **all fruits** contained within the **XML** document as well as **their colour**, may look like this:
+```xml (XSLT)
+<?xml version="1.0"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+	<xsl:template match="/fruits">
+		Here are all the fruits:
+		<xsl:for-each select="fruit">
+			<xsl:value-of select="name"/> (<xsl:value-of select="color"/>)
+		</xsl:for-each>
+	</xsl:template>
+</xsl:stylesheet>
+```
+As we can see, the **XSLT** document contains a single `<xsl:template>` **XSL element** that is applied to the `<fruits>` node in the **XML** document. 
+The template consists of the static string `Here are all the fruits:` and a loop over all `<fruit>` nodes in the **XML** document. 
+For each of these nodes, the values of the `<name>` and `<color>` nodes are printed using the `<xsl:value-of>` **XSL element**. Combining the sample **XML** document with the above **XSLT** data results in the following output:
+```
+Here are all the fruits:
+    Apple (Red)
+    Banana (Yellow)
+    Strawberry (Red)
+```
+Here are some additional **XSL elements** that can be used to narrow down further or customize the data from an **XML document**:
+- `<xsl:sort>`: This element specifies how to sort elements in a for loop in the `select` argument. Additionally, a sort order may be specified in the `order` argument
+- `<xsl:if>`: This element can be used to test for conditions on a node. The condition is specified in the `test` argument.
+For instance, we can use these **XSL elements** to create a list of all fruits that are of a **medium size ordered by their colour in descending order**:
+```xml (XSLT)
+<?xml version="1.0"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+	<xsl:template match="/fruits">
+		Here are all fruits of medium size ordered by their color:
+		<xsl:for-each select="fruit">
+			<xsl:sort select="color" order="descending" />
+			<xsl:if test="size = 'Medium'">
+				<xsl:value-of select="name"/> (<xsl:value-of select="color"/>)
+			</xsl:if>
+		</xsl:for-each>
+	</xsl:template>
+</xsl:stylesheet>
+```
+This results in the following data:
+```
+Here are all fruits of medium size ordered by their color:
+	Banana (Yellow)
+	Apple (Red)
+```
+**XSLT** can be used to **generate arbitrary output strings**. For instance, web app's may use it to embed data from  **XML documents** within an **HTML** response.
+
+As the name suggests, **XSLT injection** occurs whenever user input is inserted into **XSL** data before output generation by the **XSLT processor**.
+This enables an attacker to inject additional **XSL elements** into the **XSL** data, which the **XSLT** processor will execute during output generation.
+## Exploiting XSLT Injection
+## Identifying XSLT Injection
+Our sample web app displays basic information about some **Academy modules**:
+![[Pasted image 20241216193256.png]]
+At the bottom of the page, we can provide a **username** that is inserted into the **headline** at the top of the list:
+![[Pasted image 20241216193323.png]]
+
+The name we provide is reflected on the page. Suppose the web app stores the module information in an **XML document** and displays the data using **XSLT processing**. 
+In that case, it might suffer from **XSLT injection** if our name is inserted without sanitization before **XSLT processing**. 
+To confirm that, let us try to inject a **broken XML tag** to try to provoke an error in the web app. We can achieve this by providing the username `<`:
+![[Pasted image 20241216193456.png]]
+As we can see, the web application responds with a server error. While this does not confirm that an **XSLT injection** vulnerability is present, it might indicate the presence of a security issue.
+## Information Disclosure
+We can try to infer some basic information about the **XSLT processor** in use by injecting the following **XSLT elements**:
+```xml
+Version: <xsl:value-of select="system-property('xsl:version')" />
+<br/>
+Vendor: <xsl:value-of select="system-property('xsl:vendor')" />
+<br/>
+Vendor URL: <xsl:value-of select="system-property('xsl:vendor-url')" />
+<br/>
+Product Name: <xsl:value-of select="system-property('xsl:product-name')" />
+<br/>
+Product Version: <xsl:value-of select="system-property('xsl:product-version')" />
+```
+The web app provides the following response:
+![[Pasted image 20241216193921.png]]
+Since the web application interpreted the **XSLT elements** we provided, this confirms an **XSLT injection** vulnerability.
+Furthermore, we can deduce that the web app seems to rely on the `libxslt` library and supports **XSLT** version `1.0`.
+## Local File Inclusion (LFI)
+We can try to use multiple different functions to read a local file. Whether a payload will work depends on the **XSLT version** and the configuration of the **XSLT library**. 
+For instance, **XSLT** contains a function `unparsed-text` that can be used to read a local file:
+```xml
+<xsl:value-of select="unparsed-text('/etc/passwd', 'utf-8')" />
+```
+However, it was only introduced in **XSLT version 2.0.** Thus, our sample web app does not support this function **and instead errors out**. 
+However, if the **XSLT** library is configured to support **PHP** functions, we can call the **PHP** function `file_get_contents` using the following **XSLT element**:
+```xml
+<xsl:value-of select="php:function('file_get_contents','/etc/passwd')" />
+```
+Our sample web app is configured to support **PHP** functions. As such, the local file is displayed in the response:
+![[Pasted image 20241216194137.png]]
+## Remote Code Execution (RCE)

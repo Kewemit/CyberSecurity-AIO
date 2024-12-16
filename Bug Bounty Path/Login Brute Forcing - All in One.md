@@ -36,7 +36,6 @@ t
 | Distributed Brute Force | Distributes the brute forcing workload across multiple devices to accelerate the process.                                               | Using a cluster of computers to perform a **brute-force** attack to significantly increase the number of combinations that can be tried per second.      | The target password or key is **highly complex**, and a single machine **lacks** the **computational power** to crack it within a reasonable timeframe. |
 ### The Role of Brute Forcing in Penetration Testing
 While penetration tests encompass a range of techniques, brute forcing is often strategically employed when:
-
 - **Other avenues are exhausted**: Initial attempts to gain access, such as exploiting known vulnerabilities or utilizing social engineering tactics, may prove unsuccessful. In such scenarios, brute forcing is a viable alternative to overcome password barriers.
 - **Password policies are weak**: If the target system employs lax password policies, it increases the likelihood of users having weak or easily guessable passwords. Brute forcing can effectively expose these vulnerabilities.
 - **Specific accounts are targeted**: In some instances, penetration testers may focus on compromising specific user accounts, such as those with elevated privileges. Brute forcing can be tailored to target these accounts directly.

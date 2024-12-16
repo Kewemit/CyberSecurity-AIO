@@ -39,3 +39,61 @@ While penetration tests encompass a range of techniques, brute forcing is often 
 - **Other avenues are exhausted**: Initial attempts to gain access, such as exploiting known vulnerabilities or utilizing social engineering tactics, may prove unsuccessful. In such scenarios, brute forcing is a viable alternative to overcome password barriers.
 - **Password policies are weak**: If the target system employs lax password policies, it increases the likelihood of users having weak or easily guessable passwords. Brute forcing can effectively expose these vulnerabilities.
 - **Specific accounts are targeted**: In some instances, penetration testers may focus on compromising specific user accounts, such as those with elevated privileges. Brute forcing can be tailored to target these accounts directly.
+## Password Security Fundamentals
+Passwords are the first line of defence in protecting sensitive information and systems. A strong password is a formidable barrier, making it significantly harder for attackers to gain unauthorized access.
+### Common Password Weaknesses
+- **Short Passwords:** Passwords with fewer than **eight** characters are particularly vulnerable to brute-force attacks, as the number of possible combinations is relatively small.
+- **Common Words and Phrases:** Using dictionary words, names, or common phrases as passwords makes them susceptible to dictionary attacks.
+- **Personal Information:** Incorporating personal information like **birthdates**, **pet names**, or **addresses** into passwords makes them easier to guess, especially if this information is publicly available on social media or other online platforms.
+- **Reusing Passwords:** Using the same password across multiple accounts is risky. If one account is compromised, all other accounts using the same password are also at risk.
+- **Predictable Patterns:** Using patterns like "**qwerty**" or "**123456**" or simple substitutions like "**p@ssw0rd**" makes passwords easy to guess.
+### Password Policies
+Organizations often implement password policies to enforce the use of strong passwords. These policies typically include requirements for:
+- **Minimum Length**: The minimum number of characters a password must have.
+- **Complexity:** The types of characters that must be included in a password (e.g., **uppercase, lowercase, numbers, symbols**).
+- **Password Expiration:** The frequency where you have to change passwords periodically.
+- **Password History:** Previous passwords cannot be reused.
+### The Perils of Default Credentials
+Often overlooked is the danger posed by **default passwords**. They are often simple and easily guessable, making them a prime target for attackers.
+
+The prevalence of default passwords makes them **low-hanging fruit** for attackers. They provide an easy entry point into systems and networks, potentially leading to data breaches, unauthorized access, and other malicious activities. **Below are examples of certain default passwords:**
+![[Pasted image 20241216232427.png]]
+**Or in a table format**
+
+| <font color=" #8a5cf5">**Device/Manufacturer**</font> | <font color="#29dd01">Default Username</font> | <font color="#29dd01">Default Password </font> | <font color="#8a5cf5">Device Type </font> |
+| ----------------------------------------------------- | --------------------------------------------- | ---------------------------------------------- | ----------------------------------------- |
+| **Linksys Router**                                    | **admin**                                     | **admin**                                      | **Router**                                |
+| **D-Link Router**                                     | **admin**                                     | **admin**                                      | **Router**                                |
+| **Netgear Router**                                    | **admin**                                     | **password**                                   | **Router**                                |
+| **TP-Link Router**                                    | **admin**                                     | **admin**                                      | **Router**                                |
+| **Cisco Router**                                      | **admin**                                     | **cisco**                                      | **Router**                                |
+| **Asus Router**                                       | **admin**                                     | **admin**                                      | **Router**                                |
+| **Belkin Router**                                     | **admin**                                     | **password**                                   | **Router**                                |
+| **Zyxel Router**                                      | **admin**                                     | **1234**                                       | **Router**                                |
+| **Samsung SmartCam**                                  | **admin**                                     | **4321**                                       | **IP Camera**                             |
+| **Hikvision DVR**                                     | **admin**                                     | **12345**                                      | **Digital Video Recorder (DVR)**          |
+| **Axis IP Camera**                                    | **root**                                      | **pass**                                       | **IP Camera**                             |
+| **Ubiquiti UniFi AP**                                 | **ubnt**                                      | **ubnt**                                       | **Wireless Access Point (WAP)**           |
+| **Canon Printer**                                     | **admin**                                     | **admin**                                      | **Network Printer**                       |
+| **Honeywell Thermostat**                              | **admin**                                     | **1234**                                       | **Smart Thermostat**                      |
+| **Panasonic DVR**                                     | **admin**                                     | **12345**                                      | **Digital Video Recorder (DVR)**          |
+To truly grasp the challenge of brute forcing, it's essential **to understand the underlying mathematics**. The following formula determines the **total number of possible combinations for a password:**
+```mathML
+Possible Combinations = Character Set Size^Password Length
+```
+For example, a **6-character password** using only lowercase letters (character set size of 26) has 26^6 (approximately 300 million) possible combinations. In contrast, an 8-character password with the same character set has 26^8 (approximately 200 billion) combinations. Adding uppercase letters, numbers, and symbols to the character set further expands the search space exponentially.
+
+This exponential growth in the number of combinations highlights the importance of password length and complexity. Even a small increase in length or the inclusion of additional character types can dramatically increase the time and resources required for a successful brute-force attack.
+
+Let's consider a few scenarios to illustrate the impact of password length and character set on the search space:
+
+|                             | Password Length | Character Set                                         | Possible Combinations               |
+| --------------------------- | --------------- | ----------------------------------------------------- | ----------------------------------- |
+| **Short and Simple**        | 6               | Lowercase letters (a-z)                               | 26^6 = 308,915,776                  |
+| **Longer but Still Simple** | 8               | Lowercase letters (a-z)                               | 26^8 = 208,827,064,576              |
+| **Adding Complexity**       | 8               | Lowercase and uppercase letters (a-z, A-Z)            | 52^8 = 53,459,728,531,456           |
+| **Maximum Complexity**      | 12              | Lowercase and uppercase letters, numbers, and symbols | 94^12 = 475,920,493,781,698,549,504 |
+While a complex password can take **years** to brute-force with a single machine, a sophisticated attacker using a distributed network of high-performance computing resources could reduce that time drastically:
+![[Pasted image 20241216233948.png]]
+# Bute Force Attacks
+##  Cracking the PIN

@@ -41,7 +41,8 @@ I made this repository to document my journey and provide useful information I c
 - Web Application Security Testing ♻️
 - Reverse Engineering Basics ♻️
 - OSINT♻️
-- Server-Side Attacks ♻️
+- Server-Side Attacks ✅
+- Login Brute Forcing ♻️
 ♻️ = W.I.P
 ✅ = Completed
 ## 🔗 Resources

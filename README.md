@@ -4,6 +4,10 @@ This Obsidian project is a collection of my detailed notes, cheat sheets, and re
 This list Contains my complete cheat sheet gathered from THM, HTB and various other resources
 
 My notes were originally written in HackMD where i ported them to Obsidian. There may be some porting errors 
+
+> [!NOTE]
+> **Windows Defender might mark this as a virus since it contains examples of malicious commands (i.e. reverse shells), so you might have to exclude this project from your AV's scope.**
+
 ## Why This Repository Exists
 I made this repository to document my journey and provide useful information I could come back to anytime. It's meant to:
 - Serve as my knowledge base.
@@ -34,6 +38,7 @@ I made this repository to document my journey and provide useful information I c
 - Web Application Security Testing ♻️
 - Reverse Engineering Basics ♻️
 - OSINT♻️
+- Server-Side Attacks ♻️
 ♻️ = W.I.P
 ✅ = Completed
 ## 🔗 Resources

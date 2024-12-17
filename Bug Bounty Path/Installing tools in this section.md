@@ -5,7 +5,7 @@ $ sudo apt-get -y update
 # Install medusa
 $ sudo apt-get -y install medusa
 ```
-## Usage
+#### Usage
 ```bash
 $ medusa -h
 ```
@@ -14,10 +14,13 @@ $ medusa -h
 # Optional update
 $ sudo apt-get -y update
 # Install Hydra
-
-sudo apt-get -y install hydra 
+$ sudo apt-get -y install hydra 
 ```
-## Usage
+#### Usage
 ```bash
 $ hydra -h
+```
+# Burp Suite
+```http
+https://portswigger.net/burp/releases
 ```

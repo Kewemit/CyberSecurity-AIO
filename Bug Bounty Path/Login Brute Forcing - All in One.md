@@ -62,21 +62,21 @@ The prevalence of default passwords makes them **low-hanging fruit** for attacke
 
 | <font color=" #8a5cf5">**Device/Manufacturer**</font> | <font color="#29dd01">Default Username</font> | <font color="#29dd01">Default Password </font> | <font color="#8a5cf5">Device Type </font> |
 | ----------------------------------------------------- | --------------------------------------------- | ---------------------------------------------- | ----------------------------------------- |
-| **Linksys Router**                                    | **admin**                                     | **admin**                                      | **Router**                                |
-| **D-Link Router**                                     | **admin**                                     | **admin**                                      | **Router**                                |
-| **Netgear Router**                                    | **admin**                                     | **password**                                   | **Router**                                |
-| **TP-Link Router**                                    | **admin**                                     | **admin**                                      | **Router**                                |
-| **Cisco Router**                                      | **admin**                                     | **cisco**                                      | **Router**                                |
-| **Asus Router**                                       | **admin**                                     | **admin**                                      | **Router**                                |
-| **Belkin Router**                                     | **admin**                                     | **password**                                   | **Router**                                |
-| **Zyxel Router**                                      | **admin**                                     | **1234**                                       | **Router**                                |
-| **Samsung SmartCam**                                  | **admin**                                     | **4321**                                       | **IP Camera**                             |
-| **Hikvision DVR**                                     | **admin**                                     | **12345**                                      | **Digital Video Recorder (DVR)**          |
-| **Axis IP Camera**                                    | **root**                                      | **pass**                                       | **IP Camera**                             |
-| **Ubiquiti UniFi AP**                                 | **ubnt**                                      | **ubnt**                                       | **Wireless Access Point (WAP)**           |
-| **Canon Printer**                                     | **admin**                                     | **admin**                                      | **Network Printer**                       |
-| **Honeywell Thermostat**                              | **admin**                                     | **1234**                                       | **Smart Thermostat**                      |
-| **Panasonic DVR**                                     | **admin**                                     | **12345**                                      | **Digital Video Recorder (DVR)**          |
+| **Linksys Router**                                    | admin                                         | admin                                          | **Router**                                |
+| **D-Link Router**                                     | admin                                         | admin                                          | **Router**                                |
+| **Netgear Router**                                    | admin                                         | password                                       | **Router**                                |
+| **TP-Link Router**                                    | admin                                         | admin                                          | **Router**                                |
+| **Cisco Router**                                      | admin                                         | cisco                                          | **Router**                                |
+| **Asus Router**                                       | admin                                         | admin                                          | **Router**                                |
+| **Belkin Router**                                     | admin                                         | password                                       | **Router**                                |
+| **Zyxel Router**                                      | admin                                         | 1234                                           | **Router**                                |
+| **Samsung SmartCam**                                  | admin                                         | 4321                                           | **IP Camera**                             |
+| **Hikvision DVR**                                     | admin                                         | 12345                                          | **Digital Video Recorder (DVR)**          |
+| **Axis IP Camera**                                    | root                                          | pass                                           | **IP Camera**                             |
+| **Ubiquiti UniFi AP**                                 | ubnt                                          | ubnt                                           | **Wireless Access Point (WAP)**           |
+| **Canon Printer**                                     | admin                                         | admin                                          | **Network Printer**                       |
+| **Honeywell Thermostat**                              | admin                                         | 1234                                           | **Smart Thermostat**                      |
+| **Panasonic DVR**                                     | admin                                         | 12345                                          | **Digital Video Recorder (DVR)**          |
 To truly grasp the challenge of brute forcing, it's essential **to understand the underlying mathematics**. The following formula determines the **total number of possible combinations for a password:**
 ```mathML
 Possible Combinations = Character Set Size^Password Length
@@ -262,16 +262,16 @@ $ hydra [login_options] [password_options] [attack_options] [service_options]
 ```
 Where:
 
-| Parameter              | Explanation | Usage Example |
-| ---------------------- | ----------- | ------------- |
-| `-l LOGIN`or `-L FILE` |             |               |
-| `-p PASS` or `-P FILE` |             |               |
-| `-t TASKS`             |             |               |
-| `-f`                   |             |               |
-| `-s PORT`              |             |               |
-| `-v` or `-V`           |             |               |
-| `service://server`     |             |               |
-| `/OPT`                 |             |               |
+| Parameter              | Explanation                                                                                                      | Usage Example                                                                                                   |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `-l LOGIN`or `-L FILE` | **Login options**: Single username (`-l`) or a file containing a list of usernames (`-L`).                       | `hydra -l admin` or<br>`hydra -L usernames.txt`                                                                 |
+| `-p PASS` or `-P FILE` | **Password options**: Single password (`-p`) or a file containing a list of passwords (`-P`).                    | `hydra -p password123` or `hydra -P passwords.txt`                                                              |
+| `-t TASKS`             | **Tasks**: Define the number of parallel tasks (threads) to run, potentially speeding up the attack.             | `hydra -t 4`                                                                                                    |
+| `-f`                   | **Fast mode**: Stop the attack after the first successful login is found.                                        | `hydra -f`                                                                                                      |
+| `-s PORT`              | **Port**: Specify a **non-default** port for the target service.                                                 | `hydra -s 2222`                                                                                                 |
+| `-v` or `-V`           | **Verbose output**: Display detailed information about the attack's progress, including attempts and results.    | `hydra -v` or `hydra -V` for more verbose                                                                       |
+| `service://server`     | **Target**: Specify the service (i.e. `ssh`, `http`, `ftp`) and the target **server's address** or **hostname**. | `hydra ssh://192.168.1.100`                                                                                     |
+| `/OPT`                 | **Service-specific options**: Provide any additional options required by the target service.                     | `hydra http-get://example.com/login.php -m "POST:user=^USER^&pass=^PASS^"` (for HTTP form-based authentication) |
 ## Hydra Services
 Hydra services enable Hydra to interact with different authentication mechanisms used by various systems, applications, and network services. Each module is designed to understand a particular protocol's communication patterns and authentication requirements, allowing Hydra to send appropriate login requests and interpret the responses. Below is a table of commonly used services:
 ![[S1MQhi0VJe.png]]
@@ -520,3 +520,23 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-09-05 12:51:
 **Remember that crafting the correct `params` string is crucial for a successful Hydra attack**. 
 # Medusa
 Medusa's designed to be a **fast**, massively **parallel**, and **modular** login **brute-forcer**. Its primary objective is to support a wide array of services that allow remote authentication.
+## Command Syntax and Parameter Table
+Medusa's **CLI** allows users to specify **hosts, users, passwords, and modules** with various options to fine-tune the attack process.
+**Basic Usage:**
+```bash
+$ medusa [target_options] [credential_options] -M module [module_options]
+```
+
+**Parameter Table**:
+
+| Parameter                  | Explanation                                                                                                                                      | Usage Example                                        |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
+| `-h HOST` or `-H FILE`     | **Target options**: Either a single target **hostname** or **IP** address (`-h`) or a file containing a list of targets (`-H`).                  | `medusa -h 192.168.1.10` or `medusa -H targets.txt`  |
+| `-u USERNAME` or `-U FILE` | **Username options**: Provide either a single username (`-u`) or a file containing a list of usernames (`-U`).                                   | `medusa -u admin` or `medusa -U usernames.txt`       |
+| `-p PASSWORD` or `-P FILE` | **Password options**: Specify either a single password (`-p`) or a file containing a list of passwords (`-P`).                                   | `medusa -p password123` or `medusa -P passwords.txt` |
+| `-M MODULE`                | **Module**: Define the specific module to use for the attack (i.e. `ssh`, `ftp`, `http`).                                                        | `medusa -M ssh`                                      |
+| `-m "MODULE_OPTION"`       | **Module options**: Provide additional parameters required by the chosen module, enclosed in quotes.                                             |                                                      |
+| `-t TASKS`                 | **Tasks**: Define the number of parallel login attempts to run, potentially speeding up the attack.                                              | `medusa -t 4 ...`                                    |
+| `-f` or `-F`               | **Fast mode**: Stop the attack after the first successful login is found, either on the current host (`-f`) or any host (`-F`).                  | `medusa -f` or `medusa -F`                           |
+| `-n PORT`                  | **Port**: Specify a non-default port for the target service.                                                                                     | `medusa -n 2222`                                     |
+| `-v LEVEL`                 | **Verbose output**: Display detailed information about the attack's progress. The higher the `LEVEL` (up to **6**), the more verbose the output. | `medusa -v 4`                                        |

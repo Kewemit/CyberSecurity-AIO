@@ -42,9 +42,16 @@ I made this repository to document my journey and provide useful information I c
 - Reverse Engineering Basics ♻️
 - OSINT♻️
 - Server-Side Attacks ✅
-- Login Brute Forcing ♻️
+- Login Brute Forcing (Hydra, Medusa)♻️
+- Broken Authentication❌
+- Web Attacks❌
+- File Inclusion❌
+- Session Security❌
+- Web Service & API Attacks❌
+- WordPress Hacking❌
 ♻️ = W.I.P
 ✅ = Completed
+❌ = Not Started Yet
 ## 🔗 Resources
 
 Here are some external resources you may find helpful:

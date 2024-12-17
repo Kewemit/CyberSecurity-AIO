@@ -643,7 +643,7 @@ Further reconnaissance with `nmap` (within the **SSH** session) confirms this fi
 $ nmap localhost
 
 Starting Nmap 7.80 ( https://nmap.org ) at 2024-09-05 13:19 UTC
-... SNI
+... SNIP ...
 PORT   STATE SERVICE
 21/tcp open  ftp
 22/tcp open  ssh

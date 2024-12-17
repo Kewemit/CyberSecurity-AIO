@@ -528,6 +528,8 @@ $ medusa [target_options] [credential_options] -M module [module_options]
 ```
 
 **Parameter Table**:
+![[Pasted image 20241217180939.png]]
+Or
 
 | Parameter                  | Explanation                                                                                                                                      | Usage Example                                        |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
@@ -535,8 +537,59 @@ $ medusa [target_options] [credential_options] -M module [module_options]
 | `-u USERNAME` or `-U FILE` | **Username options**: Provide either a single username (`-u`) or a file containing a list of usernames (`-U`).                                   | `medusa -u admin` or `medusa -U usernames.txt`       |
 | `-p PASSWORD` or `-P FILE` | **Password options**: Specify either a single password (`-p`) or a file containing a list of passwords (`-P`).                                   | `medusa -p password123` or `medusa -P passwords.txt` |
 | `-M MODULE`                | **Module**: Define the specific module to use for the attack (i.e. `ssh`, `ftp`, `http`).                                                        | `medusa -M ssh`                                      |
-| `-m "MODULE_OPTION"`       | **Module options**: Provide additional parameters required by the chosen module, enclosed in quotes.                                             |                                                      |
+| `-m "MODULE_OPTION"`       | **Module options**: Provide additional parameters required by the chosen module, enclosed in quotes.                                             | See Image                                            |
 | `-t TASKS`                 | **Tasks**: Define the number of parallel login attempts to run, potentially speeding up the attack.                                              | `medusa -t 4 ...`                                    |
 | `-f` or `-F`               | **Fast mode**: Stop the attack after the first successful login is found, either on the current host (`-f`) or any host (`-F`).                  | `medusa -f` or `medusa -F`                           |
 | `-n PORT`                  | **Port**: Specify a non-default port for the target service.                                                                                     | `medusa -n 2222`                                     |
 | `-v LEVEL`                 | **Verbose output**: Display detailed information about the attack's progress. The higher the `LEVEL` (up to **6**), the more verbose the output. | `medusa -v 4`                                        |
+### Medusa Modules
+![[Pasted image 20241217181118.png]]
+or
+
+| Medusa Module    | Service/Protocol                 | Desc.                                                                                               | Usage Example                                                                                                             |
+| ---------------- | -------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| FTP              | File Transfer Protocol           | Brute-forcing FTP login credentials, used for file transfers over a network.                        | medusa -M ftp -h 192.168.1.100 -u admin -P passwords.txt                                                                  |
+| HTTP             | Hypertext Transfer Protocol      | Brute-forcing login forms on web applications over **HTTP** **(GET/POST**).                         | medusa -M http -h www.example.com -U users.txt -P passwords.txt -m DIR:/login.php -m FORM:username=^USER^&password=^PASS^ |
+| IMAP             | Internet Message Access Protocol | Brute-forcing **IMAP** logins, often used to access email servers.                                  | medusa -M imap -h mail.example.com -U users.txt -P passwords.txt                                                          |
+| MySQL            | MySQL Database                   | Brute-forcing **MySQL** database credentials, commonly used for **web applications and databases**. | medusa -M mysql -h 192.168.1.100 -u root -P passwords.txt                                                                 |
+| POP3             | Post Office Protocol 3           | Brute-forcing **POP3** logins, typically used to retrieve emails from a mail server.                | medusa -M pop3 -h mail.example.com -U users.txt -P passwords.txt                                                          |
+| RDP              | Remote Desktop Protocol          | Brute-forcing **RDP** logins, commonly used for remote desktop access to Windows systems.           | medusa -M rdp -h 192.168.1.100 -u admin -P passwords.txt                                                                  |
+| SSHv2            | Secure Shell (SSH)               | Brute-forcing **SSH** logins, commonly used for secure remote access.                               | medusa -M ssh -h 192.168.1.100 -u root -P passwords.txt                                                                   |
+| Subversion (SVN) | Version Control System           | Brute-forcing **Subversion** (**SVN**) repositories for version control.                            | medusa -M svn -h 192.168.1.100 -u admin -P passwords.txt                                                                  |
+| Telnet           | Telnet Protocol                  | Brute-forcing Telnet services for remote command execution on older systems.                        | medusa -M telnet -h 192.168.1.100 -u admin -P passwords.txt                                                               |
+| VNC              | Virtual Network Computing        | Brute-forcing VNC login credentials for remote desktop access.                                      | medusa -M vnc -h 192.168.1.100 -P passwords.txt                                                                           |
+| Web Form         | Brute-forcing Web Login Forms    | Brute-forcing login forms on websites using HTTP POST requests.                                     | medusa -M web-form -h www.example.com -U users.txt -P passwords.txt -m FORM:"username=^USER^&password=^PASS^:F=Invalid"   |
+### Targeting an SSH Server
+Imagine a scenario where you need to test the security of an **SSH** server at `192.168.0.100`. You have a list of potential usernames in `usernames.txt` and common passwords in `passwords.txt`. To launch a brute-force attack against the **SSH** service on this server, use the following Medusa command:
+```bash
+$ medusa -h 192.168.0.100 -U usernames.txt -P passwords.txt -M ssh 
+```
+This command instructs Medusa to:
+- Target the host at `192.168.0.100`.
+- Use the usernames from the `usernames.txt` file.
+- Test the passwords listed in the `passwords.txt` file.
+- Employ the `ssh` module for the attack.
+### Targeting Multiple Web Servers with Basic HTTP Authentication
+Suppose you have a list of web servers that use **basic HTTP authentication**. The addresses are stored in `web_servers.txt`, and the lists of common usernames and passwords in `usernames.txt` and `passwords.txt`, respectively. To test these servers concurrently, execute:
+```bash
+$ medusa -H web_servers.txt -U usernames.txt -P passwords.txt -M http -m GET 
+```
+In this case, Medusa will:
+- Iterate through the list of web servers in `web_servers.txt`.
+- Use the **usernames** and **passwords** provided.
+- Employ the `http` module with the `GET` method to attempt logins.
+### Testing for Empty or Default Passwords
+If you want to assess whether any accounts on a specific host (`10.0.0.5`) have **empty** or **default passwords** (where the password matches the username), you can use:
+```bash
+$ medusa -h 10.0.0.5 -U usernames.txt -e ns -M service_name
+```
+This command instructs Medusa to:
+- Target the host at `10.0.0.5`.
+- Use the **usernames** from `usernames.txt`.
+- Perform additional checks for empty passwords (`-e n`) and passwords matching the username (`-e s`).
+- Use the appropriate **service module** (replace `service_name` with the correct module name).
+Medusa will try **each username** with an **empty password** and then with the password matching the username, potentially revealing accounts with weak or default configurations.
+## Web Services
+Maintaining robust authentication mechanisms is paramount. While technologies like **Secure Shell** (**SSH**) and **File Transfer Protocol** (**FTP**) facilitate secure remote access and file management, they are often reliant on traditional username-password combinations, presenting potential vulnerabilities exploitable through brute-force attacks.
+
+In this section, we will delve into the practical application of **Medusa**, a potent brute-forcing tool, to systematically compromise both SSH and FTP services, thereby illustrating potential attack vectors and emphasizing the importance of fortified authentication practices.

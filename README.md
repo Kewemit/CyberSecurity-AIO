@@ -3,7 +3,7 @@ This Obsidian project is a collection of my detailed notes, cheat sheets, and re
 
 This list Contains my complete cheat sheet gathered from THM, HTB and various other resources
 
-My notes were originally written in HackMD where i ported them to Obsidian. There may be some porting errors 
+My notes were originally written in [HackMD](https://hackmd.io) where i ported them to **Obsidian**. There may be some porting errors 
 
 > [!NOTE]
 > **Windows Defender might mark this as a virus since it contains examples of malicious commands (i.e. reverse shells), so you might have to exclude this project from your AV's scope.**

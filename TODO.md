@@ -5,3 +5,10 @@
 - [ ] Possibly separate notes (like Command injection Thorough has subcategories like OS command injection etc instead of all in one same note.) ❌
 
 - [ ] Make a link page (see [[Linking example]])
+
+- [ ] Add TLDR section to all the Advent of Cyber Sections (est. 23% complete)
+
+- [ ] 
+
+- [ ] 
+

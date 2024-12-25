@@ -1,7 +1,7 @@
-- [ ] Understand what Wi-Fi is ✅
-- [ ] Explore its importance for an organisation✅
-- [ ] Learn the different Wi-Fi attacks✅
-- [ ] Learn about the WPA/WPA2 cracking attack✅
+- Understand what Wi-Fi is ✅
+- Explore its importance for an organisation✅
+- Learn the different Wi-Fi attacks✅
+- Learn about the WPA/WPA2 cracking attack✅
 ## What is Wi-Fi
   * Wi-Fi connects us to the **global network** through **access points** (often **routers**) that broadcast **Wi-Fi signals** with a unique **SSID** (network name). 
 * Wi-Fi **password** is called **PSK** (**Pre-Shared Key**). 

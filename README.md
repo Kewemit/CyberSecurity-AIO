@@ -1,5 +1,5 @@
 # Penetration Testing Cheat Sheet
-This Obsidian project is a collection of my detailed notes, cheat sheets, and references, all focused on penetration testing and related cybersecurity concepts.
+This Obsidian project is a collection of my detailed notes, cheat sheets, and references, all focused on penetration testing and related cybersecurity concepts. 
 
 This list Contains my complete cheat sheet gathered from THM, HTB and various other resources
 
@@ -12,6 +12,7 @@ My notes were originally written in [HackMD](https://hackmd.io) where i ported t
 I made this repository to document my journey and provide useful information I could come back to anytime. It's meant to:
 - Serve as my knowledge base.
 - Possibly help others learn and understand some concepts.
+- Notes I can come back to when in need, without having to open specific sites.
 ## 🚀 Getting Started
 
 1. Clone the repository using the following command:
@@ -58,6 +59,12 @@ Here are some external resources you may find helpful:
 - [OWASP](https://owasp.org/)
 - [Hack The Box](https://www.hackthebox.com/)
 - [TryHackMe](https://tryhackme.com/)
+
+## ♻️TBA
+- Current est. for porting the **base** layer of all the notes: `02/2025`
+- Github Page
+- Make GitHub environment friendly notes
+
 ## 🛡 Disclaimer
 
 This repository is intended for **educational purposes only**. The techniques and tools discussed here should only be used in ethical hacking scenarios with proper authorization. Misuse of this knowledge can lead to severe consequences. Always practice responsible and ethical behaviour.

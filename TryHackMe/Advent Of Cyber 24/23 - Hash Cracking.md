@@ -141,3 +141,61 @@ $ john --format=raw-sha256 --rules=wordlist --wordlist=/usr/share/wordlists/rock
 We should note that `john` will not spend computing resources to crack an already-cracked password hash. Consequently, if you repeat a command that has successfully found a password earlier, you will get a message like “``No password hashes left to crack (see FAQ)``”. 
 
 Let’s say that you executed the command listed above and you recovered the password; then, the next time you want to see that password, you would use `john` with the `--show` option, for example, `john --format=raw-sha256 --show hash1.txt`.
+
+### Password Protected File Cracking
+We focus on the data discovered in the Mayor’s trash. There is one interesting-looking PDF file that happens to be password-protected. 
+
+The first thing we need to do is to convert the **password-protected file** into a format that `john` can attack. Luckily, ``John the Ripper jumbo edition`` comes with the necessary tools. The different tools follow the naming style “``format2john``”. Below are a few examples:
+```bash
+$ ls /opt/john/*2john*
+
+/opt/john/1password2john.py      /opt/john/ethereum2john.py          /opt/john/openssl2john.py
+/opt/john/7z2john.pl             /opt/john/filezilla2john.py         /opt/john/padlock2john.py
+/opt/john/DPAPImk2john.py        /opt/john/geli2john.py              /opt/john/pcap2john.py
+/opt/john/adxcsouf2john.py       /opt/john/gpg2john                  /opt/john/pdf2john.pl
+/opt/john/aem2john.py            /opt/john/hccap2john                /opt/john/pdf2john.py
+/opt/john/aix2john.pl            /opt/john/hccapx2john.py            /opt/john/pem2john.py
+/opt/john/aix2john.py            /opt/john/htdigest2john.py          /opt/john/pfx2john.py
+...SNIP...
+```
+We are interested in a PDF; therefore, `pdf2john.pl` should do fine. In the view below, we can see how to create a hash challenge from a PDF file. This hash value can later be fed to `john` to crack it:
+```bash
+$ pdf2john.pl private.pdf > pdf.hash 
+
+$ cat pdf.hash private.pdf:$pdf$2*3*128*-1028*1*16*c1e77e30a0456552cb8a5327241559bd*32*3dc175eae491edc29b937e4fdbda766c00000000000000000000000000000000*32*6a1b5158d8d6dd9e8380f87b624da6cc936075fd41dc3c76acf2d90db62e4a27
+```
+The first step to consider would be trying a long wordlist such as `rockyou.txt`; moreover, you might even use a rule such as `--rules=wordlist` to test derived passwords.
+
+In our case, neither of these approaches work; Mayor Malware has picked a password that does not exist in these public wordlists and is not derived from any word found there. Knowing Mayor Malware, we see what he holds dear, which can hint at what he would consider for his password. 
+
+Therefore, we need to create your own wordlist with the following words:
+- Fluffy
+- FluffyCat
+- Mayor
+- Malware
+- MayorMalware
+Save the file as `wordlist.txt`. 
+
+Our command for cracking the pdf hash would be:
+```bash
+john --rules=single --wordlist=wordlist.txt pdf.hash
+```
+**Where:**
+- `--rules=single`: covers more modification rules and transformations on the wordlist.
+- `--wordlist=wordlist.txt`: Uses the wordlist that we created.
+- `pdf.hash`: Hash from the password-protected PDF.
+- 
+Now, we have gained all the necessary knowledge to tackle the questions below and uncover what Mayor Malware has been hiding in his password-protected document:
+```bash
+$ john --rules=single --wordlist=wordlist.txt pdfhash 
+
+Using default input encoding: UTF-8
+...SNIP...
+Enabling duplicate candidate password suppressor
+M4y0rM41w4r3     (private.pdf)     
+1g 0:00:00:00 DONE (2024-12-26 19:08) 3.030g/s 3684p/s 3684c/s 3684C/s mayored..afluffy
+Use the "--show --format=PDF" options to display all of the cracked passwords reliably
+Session completed. 
+```
+Now with the password `M4y0rM41w4r3` we can get to the PDF. To display the PDF contents in the terminal, we can use `pdftotext` with the correct flags.
+![[Pasted image 20241226211807.png]]

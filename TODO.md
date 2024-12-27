@@ -2,13 +2,16 @@
    
 - [ ] Upload rest of the HackMD material ❌
   
-- [ ] Possibly separate notes (like Command injection Thorough has subcategories like OS command injection etc instead of all in one same note.) ❌
+- [ ] Separate notes (like Command injection Thorough has subcategories like OS command injection etc instead of all in one same note.) ❌
 
 - [ ] Make a link page (see [[Linking example]])
 
 - [ ] Add TLDR section to all the Advent of Cyber Sections (est. 23% complete)
 
-- [ ] 
+- [ ] Finish HTML AIO
 
-- [ ] 
+- [ ] Finish Docker AIO
+
+- [ ] Finish Linux permission Cheatsheet
+- [ ] Finish HTML Tag Cheatsheet
 

@@ -12,6 +12,6 @@
 
 - [ ] Finish Docker AIO
 
-- [ ] Finish Linux permission Cheatsheet
+- [x] Finish Linux permission Cheatsheet
 - [ ] Finish HTML Tag Cheatsheet
 

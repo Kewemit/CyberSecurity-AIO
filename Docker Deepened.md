@@ -229,42 +229,117 @@ services:
 * For more advanced users, there are tools to **adjust kernel capabilities and set restart policies**.
 Whether you’re using **[[#Docker CLI|command line]] flags** or [[#Docker compose]], these options help ensure your containers run smoothly and consistently, no matter where they’re deployed.
 # Container Security
-
+Container security encompasses a broad set of practices and tools aimed at **protecting containerized applications from development** through **deployment** and **runtime**. 
+**It involves:**
+* Securing the container image.
+* Ensuring that only trusted and non-vulnerable code is used.
+* Implementing strong access controls for container environments.
+* Configuring containers to follow the principle of least privilege. 
+**Additionally:**
+* It includes monitoring for unexpected behaviour,
+* Protecting communication between containers,
+* Maintaining the host environment’s security. 
+Effective container security integrates seamlessly into **DevSecOps** workflows to provide continuous visibility and protection across the container lifecycle without disrupting development speed or agility.
 
 ## Runtime Security
+Runtime security in Docker focuses on **ensuring the safety and integrity of containers during their execution, safeguarding against vulnerabilities and malicious activities** that could arise while the containerized application is running. 
 
+This involves **monitoring** container behaviour for anomalies, implementing access controls to limit permissions, and employing tools to detect and respond to suspicious activity in real time. 
 
+**Effective runtime security** also ensures that **only verified images are deployed** and continuously audits the system to **maintain compliance**, thereby providing a robust defence layer to prevent exploits and maintain the desired security posture throughout the container lifecycle.
 ## Image Security
+Image security is a crucial aspect of deploying Docker containers in your environment. Ensuring the images you use are:
+* Secure, 
+* Up to date, 
+* and free of vulnerabilities 
+is essential. 
 
-
+When pulling images from public repositories, always use **trusted**, **official images** as a starting point for your containerized applications. Official images are **vetted by Docker** and are regularly updated with security fixes. You can find these images on the [Docker Hub](https://hub.docker.com/) or other trusted registries.
 # Docker CLI
+The ``Docker Command Line Interface`` (**CLI**) is a powerful tool used to interact with the Docker engine, enabling developers and operators to build, manage, and troubleshoot containers and related resources. 
 
+The **Docker CLI** provides control over all aspects of Docker, including:
+* Creating and managing containers (`docker run`, `docker stop`)
+* Building images (`docker build`)
+* Managing networks (`docker network`)
+* Handling storage (`docker volume`)
+* Inspecting system status (`docker ps`, `docker info`)
 
+Its intuitive syntax and flexibility allow users to:
+* Automate complex workflows
+* Streamline development processes
+* Maintain containerized applications with ease
+All of the above play a part in making it a foundational utility for Docker management and orchestration.
 ## Images
+Docker images are **lightweight**, **standalone**, and **executable software packages** that include everything needed to run a piece of software, such as the application code, runtime, libraries, and system tools.
 
+Images serve as the **blueprint** for creating containers and are built in layers, where each layer represents a file system change, allowing for efficient storage and distribution. 
 
+**Docker images** can be stored in and pulled from container registries like  [Docker Hub](https://hub.docker.com/), enabling developers to share, deploy, and version their applications consistently across different environments, ensuring reproducibility and simplifying the process of managing dependencies.
 ## Containers
+Containers are **isolated**, **lightweight environments** that run applications using a **shared operating system kernel**, ensuring consistency and portability across different computing environments. 
 
+Containers encapsulate everything needed to run an application, such as **code**, **dependencies**, and **configurations**, making it easy to move and run the containerized application anywhere.
 
+Using the **Docker CLI**, you can **create**, **start**, **stop**, and **manage containers** with commands like `docker run`, `docker ps` to list running containers, `docker stop` to halt them, and `docker exec` to interact with them in real time.
+
+The **CLI** provides a powerful interface for developers to **build**, **control**, and **debug containers** effortlessly, allowing for streamlined development and operational workflows.
 ## Volumes
+Docker volumes are **persistent storage solutions** used to **manage** and **store** data outside the container’s filesystem, ensuring data remains intact even if the container is **deleted** or **recreated**. 
 
+Volumes are ideal for storing **application data**, **logs**, and **configuration files** that need to persist across container restarts and updates. 
+
+With the **Docker CLI**, you can **create** and **manage** volumes using commands like:
+* `docker volume create` to define a new volume
+* `docker volume ls` to list all volumes
+* `docker run -v` to mount a volume to a specific container. 
+This approach helps maintain data integrity, simplifies backup processes, and supports data sharing between containers, making volumes a core part of stateful containerized applications.
 ## Networks
+Docker networks **enable containers to communicate with each other and with external systems**, providing the necessary connectivity for microservices architectures. 
 
+By default, Docker offers several network types such as **bridge, host**, and **overlay**, each suited for different use cases like **isolated environments, high-performance scenarios**, or **multi-host communication**. 
+
+Using the **Docker CLI**, you can **create**, **inspect**, and **manage networks** with commands like:
+* `docker network create` to define custom networks
+* `docker network ls` to list existing networks
+* `docker network connect` to attach a container to a network. 
+This flexibility allows developers to control how containers interact, ensuring secure and efficient communication across distributed applications.
 # Developer Experience
 ## Hot Reloading
+Even though we can speed up the image building with layer caching enabled, we don’t want to have to rebuild our container image with every code change.
 
+Instead, we want the state of our application in the container to reflect changes immediately. We can achieve this through a combination of bind mounts and hot reloading utilities!
 ## Debuggers
-
+In order to make developing with containers competitive with developing locally, we need the ability to run and attach to debuggers inside the container.
 ## Tests
+We want to run **tests** in an environment as similar as possible to production, so it only makes sense to do so inside of our containers!
 
+This can include **unit tests**, **integration tests**, and **end-to-end tests**, all run within Docker containers to simulate real-world scenarios while avoiding interference from external dependencies. 
+
+Using **Docker CLI** and tools like **Docker Compose**, you can create isolated testing environments, run tests in parallel, and spin up and tear down the necessary infrastructure automatically.
 ## Continuous Integration
+Continuous integration is the idea of executing some actions (for example **build**, **test**, **etc**…) automatically as you push code to your version control system.
 
-
+For containers, there are a number of things we may want to do:
+- Build the container images
+- Execute tests
+- Scan container images for vulnerabilities
+- Tag images with useful metadata
+- Push to a container registry
 # Deploying Containers
-
+Deploying containers is a crucial step in using Docker and containerization to:
+* Manage applications more efficiently,
+* Easily scale, and
+* Ensure consistent performance across environments. 
+This topic will give you an overview of how to deploy Docker containers to create and run your applications.
 ## PaaS Options
+``Platform-as-a-Service`` (**PaaS**) options for deploying containers provide a simplified and managed environment where developers can **build**, **deploy**, and **scale containerized applications** without worrying about the underlying infrastructure. 
 
+Popular **PaaS** offerings include **Google Cloud Run**, **Azure App Service**, **AWS Elastic Beanstalk**, and **Heroku**, which abstract away container orchestration complexities while offering automated scaling, easy integration with ``CI/CD`` pipelines, and **monitoring** capabilities. 
+
+These platforms support **rapid development and deployment** by allowing teams to focus on application logic rather than **server management**, providing a seamless way to run containers in production with minimal operational overhead.
 ## Kubernetes
+Kubernetes is an **open-source container orchestration platform** designed to **automate** the **deployment**, **scaling**, and **management** of containerized applications. It provides a robust framework for handling complex container workloads by organizing containers into logical units called pods, managing service discovery, load balancing, and scaling through declarative configurations. Kubernetes enables teams to deploy containers across clusters of machines, ensuring high availability and fault tolerance through self-healing capabilities like automatic restarts, replacements, and rollback mechanisms. With its extensive ecosystem and flexibility, Kubernetes has become the de facto standard for running large-scale, distributed applications, simplifying operations and improving the reliability of containerized workloads.
 
 ## Docker Swarm
 

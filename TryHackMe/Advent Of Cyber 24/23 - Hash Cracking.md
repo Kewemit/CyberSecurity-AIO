@@ -1,7 +1,7 @@
-- Hash functions and hash values
-- Saving hashed passwords
-- Cracking hashes
-- Finding the password of a password-protected document
+- Hash functions and hash values ✅
+- Saving hashed passwords✅
+- Cracking hashes✅
+- Finding the password of a password-protected document✅
 
 # Hashed Passwords
 Before we dive further, it is helpful to learn how passwords are saved in authentication systems. In the past passwords were stored in cleartext along with the associated username.

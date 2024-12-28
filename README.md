@@ -52,6 +52,10 @@ I made this repository to document my journey and provide useful information I c
 - WordPress Hacking❌
 - Azure♻️
 - AWS♻️
+- Docker♻️
+- HTML♻️
+- C#❌
+
 ♻️ = W.I.P
 ✅ = Completed
 ❌ = Not Started Yet

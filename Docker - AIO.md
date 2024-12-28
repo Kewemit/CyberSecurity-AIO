@@ -225,3 +225,8 @@ Deleted: sha256:ac28800ec8bb38d5c35b49d45a6ac4777544941199075dff8c4eb63e093aa81e
 What docker did here was to `untag` the image removing the references to the sha of the image. After the image has no references, it deletes the two layers the image itself is comprised of.
 ### Cleaning up
 When **building**, **running** and **rebuilding images**, you download and store a lot of layers. These layers will not be deleted, as docker takes a very conservative approach to clean up.
+
+## 04 - A basic Webserver
+Pull down the `nginx` Docker image from the Docker Hub. This Docker image uses the [Nginx](http://nginx.org/) webserver to serve a static HTML website.
+
+Start a new container from the `nginx` image that exposes port 80 from the container to port 8080 on your host. You will need to use the `-p` flag with the docker container run command.

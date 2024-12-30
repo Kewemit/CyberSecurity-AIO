@@ -282,4 +282,457 @@ The HTML `<pre>` element defines a preformatted text.
 
 The text inside a `<pre>` element is displayed in **a fixed-width font** (usually **Courier**), and it preserves both spaces and line breaks.
 # HTML Styles
-https://www.w3schools.com/html/html_styles.asp
+The HTML `style` attribute is used to add **styles to an element** (i.e. colour, font or size).
+```html
+<p style="color:red">This text is red</p>
+<p style="color:blue">This text is blue</p>
+
+<p style="font-size:30px">This text is big</p>
+
+<p style="font-size:30px;color:red">This text is big and red</p>
+```
+## Style attribute
+Setting the style can be done with the `style` attribute, and it has the following syntax
+```html
+<tagname style="property:value;">
+```
+Here, the _**property**_ is a **CSS** property. The _**value**_ is a **CSS** value.
+## Background Color
+The **CSS** `background-color` property defines the background colour for an HTML element.
+
+Set the background for the **whole site**
+```html
+<body style="background-color:red;">
+<h1>My Heading</h1>
+<p>My paragraph</p>
+</body>
+```
+
+Or alternatively set the background color for **two different elements**:
+```html
+<body>
+
+<h1 style="background-color:red">This is my heading</h1>
+<p style="background-color:powderblue">This is my paragraph</p>
+
+</body>
+```
+
+## Text Color
+The **CSS** ``color`` property defines the text color for an HTML element:
+```html
+<body>
+
+<h1 style="color:green">This is my heading</h1>
+<p style="color:brown">This is my paragraph</p>
+
+</body>
+```
+
+## Fonts
+The **CSS** `font-family` property defines the font to be used for an HTML element:
+```html
+<body>
+
+<h1 style="font-family:verdana"> This Is My Heading</h1>
+<p style="font-family:courier">This is my paragraph</p>
+
+</body>
+```
+
+## Text Size
+The **CSS** `font-size` property defines the text size for an HTML element:
+```html
+<h1 style="font-size:300%">This is my heading</h1>
+<p style="font-size:180%">This is my paragraph</p>
+```
+
+## Text Alignment
+The `text-align` property defines the horizontal text alignment for an HTML element:
+```html
+<h1 style="text-align:center">Centered Heading</h1>
+<p style="text-align:right">This is my paragraph on the right</p>
+```
+
+## Summary
+- Use the `style` for styling HTML elements
+- Use `background-color` for background color
+- Use `color` for text colours
+- Use `font-family` for text fonts
+- Use `font-size` for text sizes
+- Use `text-align` for text alignment
+# HTML Formatting
+Formatting elements were designed to display special types of text:
+- `<b>` - Bold text
+- `<strong>` - Important text
+- `<i>` - Italic text
+- `<em>` - Emphasized text
+- `<mark>` - Marked text
+- `<small>` - Smaller text
+- `<del>` - Deleted text
+- `<ins>` - Inserted text
+- `<sub>` - Subscript text
+- `<sup>` - Superscript text
+## The `<b>` and `<strong>` Elements
+The `<b>` element defines bold text:
+```html
+<b>This text is bold</b>
+
+<!-- Or -->
+<p style="font-family:courier"><b>This is my paragraph</b></p>
+```
+
+The `<strong>` element defines text with strong importance. The content is usually just bold:
+```html
+<strong>This text is important!</strong>
+```
+
+## The `<i>` and `<em>` Elements
+The `<i>` element defines text in italic. 
+Info: (Often used to indicate a technical term, a phrase from another language, a thought, a ship name, etc).
+```html
+<i>My text is in italic</i>
+```
+
+The `<em>` element defines emphasized text. Typically italic:
+```html
+<em>My text is emphasized</em>
+```
+
+## The `<small>` Element
+The `<small` element defines smaller text:
+```html
+<small>This text is smaller</small>
+```
+## The `<mark>` Element
+The `<mark>` element  defines text that should be marked or highlighted:
+```html
+<p>Dont forget to buy <mark>Toilet Paper</mark> from the store</p>
+```
+## The `<del>` Element
+The `<del>` element defines text that has been deleted. Browsers usually strike a line through deleted text:
+```html
+<p>My favorite color is <del>green</del> Purple</p>
+```
+## The `<ins>` Element
+The `<ins>` element defines text that has been inserted. Browsers will underline this:
+```html
+<p>My favorite color is <del>purple</del> <ins>Green</ins>.</p>
+```
+## The `<sub>` Element
+The `<sub>` element defines subscript text. Usually used for chemical formulas: H<sub>2</sub>O
+```html
+<p>This is <sub>Subscripted</sub> text</p>
+```
+## The `<sup>` Element
+The `<sup>` element defines superscript text. Usually for footnotes: WWW<sup>[1]</sup>
+```html
+<p> This is <sup>superscripted</sup> text </p>
+```
+## Summary
+| Tag          | Description                         |
+| ------------ | ----------------------------------- |
+| ``<b>``      | Defines **bold** text               |
+| ``<em>``     | Defines **emphasized** text         |
+| ``<i>``      | Defines **italic** text             |
+| ``<small>``  | Defines **smaller** text            |
+| ``<strong>`` | Defines **important** text          |
+| ``<sub>``    | Defines **subscripted** text        |
+| ``<sup>``    | Defines **superscripted** text      |
+| ``<ins>``    | Defines **inserted** text           |
+| ``<del>``    | Defines **deleted** text            |
+| ``<mark>``   | Defines **marked/highlighted** text |
+# HTML Quotation and Citation
+Here, we will go through the `<blockquote>`,`<q>`, `<abbr>`, `<address>`, `<cite>`, and `<bdo>`  elements.
+## The `<blockquote>` for Quotations
+The `<blockquote>` element defines a section that is quoted from another source. 
+**Browsers usually indent these elements**:
+```html
+<p>Here is a quote from WWF´s website</p>
+<blockquote cite="http://www.worldwildlife.org/who/index.html">
+For 60 years, WWF has worked to help people and nature thrive. As the world´s leading conservation organization, WWF works in nearly 100 countries. At every level, we collaborate with people around the world to develop and deliver innovative solutions that protect communities, wildlife, and the places in which they live.
+</blockquote>
+```
+## The `<q>` for Short Quotations
+The `<q>` tag defines *short* quotation. Browsers usually insert quotation marks around the text:
+```html
+<p>WWF's goal is to: <q>Build a future where people...</q></p>
+```
+
+## The `<abbr>` for Abbreviations
+The `<abbr>` tag defines an abbreviation or an acronym, like "HTML", "CSS", "Mr.", "Dr.", "ASAP", "ATM".
+
+Marking abbreviations can give useful information to browsers.
+```html
+<p>The <abbr title="World Health Organization">WHO</abbr> was founded in 1948</p>
+```
+>[!important] **Tip:** use the [[#The title Attribute| global title]] attribute to show the description for the abbreviation when you hover over the element.
+## The `<address>` for Contact Information
+The `<address>` tag defines the contact information for the author of a document or an article.
+
+The contact information can be an **email address, URL, physical address, phone number, social media handle, etc**.
+
+The text in the `<address>` element usually renders in _italic,_ and browsers will always add a line break before and after the `<address>` element.
+```html
+<address>
+Written by Me <br>
+Visit us at: <br>
+MySite.com <br>
+MyAddress <br>
+Finland
+</address>
+```
+## The ``<cite>`` for Work Title
+The `<cite>` tag defines the **title** of a creative work (e.g. a book, a poem, a song, a movie, a painting, a sculpture, etc.).
+
+**Note:** A person's name is not the title of a work.
+
+The text in the `<cite>` element usually renders in _italic_.
+```html
+<p><cite>The Scream</cite> by Edvard Munch. Painted in 1893.<p>
+```
+
+## The `<bdo>` for Bi-Directional Override
+The `<bdo>` tag is used to override the current text direction:
+(_BDO stands for Bi-Directional Override_)
+```html
+<bdo dir="rtl">This text will be written from right to left</bdo>
+```
+## Summary
+
+| Tag            | Description                                          |
+| -------------- | ---------------------------------------------------- |
+| `<abbr>`       | Defines an abbreviation or acronym                   |
+| `<address>`    | Defines contact information                          |
+| `<bdo>`        | Defines text direction                               |
+| `<blockquote>` | Defines a section that is quoted from another source |
+| `<cite>`       | Defines the title of a work                          |
+| `<q>`          | Defines a short inline quotation                     |
+# HTML Comments
+Comments are not displayed in the browser, but they can help document your HTML source code.
+## Comment Tag
+You can add comments to the source code with:
+```html
+<!-- Write your comment here -->
+```
+Note 2 things. 
+	* There is an exclamation mark at the start (`!`)
+	* Comments are not displayed by the browser, they only appear in source code
+### Add Comments
+```html
+<!-- This is a comment -->
+
+<p>My paragraph</p>
+
+<!-- Another comment -->
+```
+### Hide Content
+```html
+<!-- <p>My Hidden Paragraph</p> -->
+```
+
+Or hide multiple sections with:
+```html
+<!--
+These are all commented
+<p>Another commented paragraph</p>
+-->
+```
+
+Or hide inline content with:
+```html
+<p>This is my <!-- paragraph ---> right here!</p>
+```
+# HTML Colours
+In this category we will explore different ways to color with HTML.
+## Background color
+You can set the background for elements:
+```html
+<h1 style="background-color:DodgerBlue">Hello everyone!</h1>
+<p style="background-color:Tomato">My red text<p>
+```
+## Text Color
+You can set the color of text:
+```html
+<h1 style="color:Tomato">Hello everyone!</h1>
+<p style="color:blue">My blue text</p>
+<p style="color:green">My green text</p>
+```
+## Border Color
+```html
+<h1 style="border:8px solid Green">My bordered Green header</h1>
+<h1 style="border:6px solid Blue">My bordered Blue header</h1>
+<h1 style="border:2px solid Violet">My bordered Violet header</h1>
+```
+>[!important] To change the thickness of the border modify the `px` value.
+## Colour Values
+In HTML, colours can also be specified using **RGB** values, **HEX** values, **HSL** values, **RGBA** values, and **HSLA** values:
+```html
+<h1 style="background-color:rgb(255, 99, 71);">...</h1>  
+<h1 style="background-color:#ff6347;">...</h1>  
+<h1 style="background-color:hsl(9, 100%, 64%);">...</h1>  
+  
+<h1 style="background-color:rgba(255, 99, 71, 0.5);">...</h1>  
+<h1 style="background-color:hsla(9, 100%, 64%, 0.5);">...</h1>
+```
+# HTML Styles - CSS
+## What is CSS
+Cascading Style Sheets (CSS) is used to format the layout of a webpage.
+
+With **CSS**, you can control the **color**, **font**, **the size of text**, **the spacing between elements**, **how elements are positioned and laid out, what background images or background colours are to be used, different displays for different devices and screen sizes, and much more**!
+>[!important] **Tip:** The word **cascading** means that a style applied to a parent element will also apply to all children elements within the parent. So, if you set the color of the body text to "blue", all headings, paragraphs, and other text elements within the body will also get the same color (unless you specify something else)!
+## Ways of Using CSS
+CSS can be added to the HTML document in 3 ways:
+* **Inline**: By using the `style` attribute inside HTML elements.
+* **Internal**: By using a `<style>` element in the `<head>` section.
+* **External**: By using a `<link>` element to link to an external CSS file.
+The most **common way** to add CSS, is to keep the styles in **external CSS files**. However, this time we will use **inline** and **internal styles**.
+## Inline CSS
+* It's used to apply a unique style to a single HTML element.
+* An inline CSS uses the `style` attribute of an HTML element.
+The following example sets the text color of the `<h1>` element to blue, and the text color of the `<p>` element to red:
+```html
+<h1 style="color:blue">This is my header!</h1>
+<p style="color:red">This is my paragraph</p> 
+```
+## Internal CSS
+* Used to define a style for a **single HTML page**.
+* An internal CSS is defined in the `<head>` section of an HTML page, within a `<style>` element.
+
+The following example sets:
+* The text color of **ALL** the `<h1>` elements (on that page) to blue, 
+* The text color of **ALL** the `<p>` elements to red, and
+* In addition, the page will be displayed with a "powderblue" background color:
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {background-color: powderblue;}
+h1 {color: blue}
+p {color: red}
+</style>
+</head>
+
+<body>
+<h1>This Is My Header</h1>
+<p>This is my paragraph</p
+</body>
+</html>
+```
+
+## External CSS
+ An external style sheet is used to define the style for **many** HTML pages.
+
+To use an external style sheet, add a link to it in the `<head>` section of each HTML page:
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>This is My Header</h1>
+<p>my paragraph</p>
+
+</body>
+</html>
+```
+The **external style sheet** can be written in any text editor. The file must **not** contain any HTML code, and must be saved with a ``.css`` extension.
+
+Here is what the "**styles.css**" file looks like:
+```css
+body {
+	background-color: powderblue;
+}
+h1 {
+	color: blue;
+}
+p {
+	color: red;
+}
+```
+>[!important] **Tip:** With an external style sheet, you can change the look of an entire web site, by changing one file!
+
+## CSS Colours, Fonts and Sizes
+Here, are some commonly used CSS properties:
+* The CSS `color` property defines the text color to be used.
+* The CSS `font-family` property defines the font to be used.
+* The CSS `font-size` property defines the text size to be used.
+```css
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+h1 {
+	color: blue
+	font-family: verdana;
+	font-size: 300%;
+}
+p {
+	color: red
+	font-family: courier:
+	font-size: 160%;
+	}
+</style>
+</head>
+
+<body>
+	<h1>This Is My Header</h1>
+	<p>This is my paragraph</p>
+</body>
+</html>
+```
+## CSS Border
+The `border` property defines a border around an HTML element.
+```css
+p {
+	border: 2px solid violet;
+}
+```
+>[!important] **Tip:** You can define a border for nearly all HTML elements.
+## CSS Padding
+The `padding` property defines a padding (space) between the text and the border.
+```css
+p {
+	border: 2px solid violet;
+	padding: 30px;
+}
+```
+## CSS Margin
+The `margin` property defines a margin (space) outside the border.
+```css
+p {
+	border: 2px solid violet;
+	margin: 50px;
+}
+```
+## Link to External CSS
+External style sheets can be referenced with a **full URL** or with a path **relative** to the current web page:
+**Full URL**:
+```html
+<link rel="stylesheet" href="https://mysite.com/html/styles.css">
+```
+
+**Relative in html folder**:
+```html
+<link rel="stylesheet" href="/html/styles.css">
+```
+
+**Relative in same folder**:
+```html
+<link rel="stylesheet" href="styles.css">
+```
+## Chapter Summary
+- Use the HTML `style` attribute for inline styling
+- Use the HTML `<style>` element to define internal CSS
+- Use the HTML `<link>` element to refer to an external CSS file
+- Use the HTML `<head>` element to store ``<style>`` and ``<link>`` elements
+
+- Use the CSS `color` property for text colours
+- Use the CSS `font-family` property for text fonts
+- Use the CSS `font-size` property for text sizes
+- Use the CSS `border` property for borders
+- Use the CSS `padding` property for space inside the border
+- Use the CSS `margin` property for space outside the border

@@ -13,7 +13,7 @@ I made this repository to document my journey and provide useful information I c
 - Serve as my knowledge base.
 - Possibly help others learn and understand some concepts.
 - Notes I can come back to when in need, without having to open specific sites.
-## 🚀 Getting Started
+## Getting Started
 
 1. Clone the repository using the following command:
 	`git clone https://github.com/Kewemit/pentest.git`
@@ -35,7 +35,7 @@ I made this repository to document my journey and provide useful information I c
 - Recon & Enumeration ♻️
 - Exploitation Techniques ♻️
 - Post-Exploitation ♻️
-- Shellcode Basics ✅
+- Shellcode Basics ♻️
 - Using PowerShell & Windows API ♻️
 - Evading Defenders & Bypassing AV ♻️
 - Network Penetration Testing ♻️
@@ -55,22 +55,25 @@ I made this repository to document my journey and provide useful information I c
 - Docker♻️
 - HTML♻️
 - C#❌
+- Python❌
+- Network(ing)♻️ (not yet uploaded to github)
 
 ♻️ = W.I.P
 ✅ = Completed
 ❌ = Not Started Yet
-## 🔗 Resources
+## Resources
 
 Here are some external resources you may find helpful:
 - [OWASP](https://owasp.org/)
 - [Hack The Box](https://www.hackthebox.com/)
 - [TryHackMe](https://tryhackme.com/)
+- [Cisco NetAcad](https://www.netacad.com/)
 
 ## ♻️TBA
 - Current est. for porting the **base** layer of all the notes: `02/2025`
 - Github Page
-- Make GitHub environment friendly notes
+- Make GitHub friendly notes
 
-## 🛡 Disclaimer
+## Disclaimer
 
 This repository is intended for **educational purposes only**. The techniques and tools discussed here should only be used in ethical hacking scenarios with proper authorization. Misuse of this knowledge can lead to severe consequences. Always practice responsible and ethical behaviour.

@@ -227,13 +227,17 @@ What docker did here was to `untag` the image removing the references to the sha
 When **building**, **running** and **rebuilding images**, you download and store a lot of layers. These layers will not be deleted, as docker takes a very conservative approach to clean up.
 
 Docker provides the `prune` command, taking all dangling containers/images/networks/volumes.
-* `docker container prune`
-* `docker image prune`
-* `docker network prune`
-* `docker volume prune`
-The ``docker image prune`` command allows you to clean up unused images. By default, docker image prune only cleans up dangling images. A dangling image is one that is not tagged and is not referenced by any container. To remove all _unused_ resources, resources that are not directly used by any existing containers, use the `-a` switch as well.
+* `docker container prune`: To delete all containers
+* `docker image prune`: To delete all images
+* `docker network prune`: To delete all networks
+* `docker volume prune`: To delete all volumes
 
+The ``docker image prune`` command allows you to clean up unused images. By default, docker image prune only cleans up dangling images. A dangling image is one that is **not tagged** and is **not referenced** by any container. To remove all **_unused_** resources, resources that are not directly used by any existing containers, use the `-a` switch as well.
+
+If you want a general clean-up, then `docker system prune` is your friend.
+### Summary 
+You have now seen the swiftness of **creating** a new container from an image, **trashing** it, and create a new one on top of it. You have learned to use `container rm` for deleting containers, `image rm` for images, `image ls` for listing the images and `container ls -a` to look at all the containers on your host.
 ## 04 - A basic Webserver
-Pull down the `nginx` Docker image from the Docker Hub. This Docker image uses the [Nginx](http://nginx.org/) webserver to serve a static HTML website.
+Pull the `nginx` Docker image from the Docker Hub. This Docker image uses the [Nginx](http://nginx.org/) webserver to serve a **static HTML website**.
 
-Start a new container from the `nginx` image that exposes port 80 from the container to port 8080 on your host. You will need to use the `-p` flag with the docker container run command.
+Start a new container from the `nginx` image that exposes port ``80`` from the container to port ``8080`` on your host. You will need to use the `-p` flag with the docker container run command.

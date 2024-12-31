@@ -226,6 +226,13 @@ What docker did here was to `untag` the image removing the references to the sha
 ### Cleaning up
 When **building**, **running** and **rebuilding images**, you download and store a lot of layers. These layers will not be deleted, as docker takes a very conservative approach to clean up.
 
+Docker provides the `prune` command, taking all dangling containers/images/networks/volumes.
+* `docker container prune`
+* `docker image prune`
+* `docker network prune`
+* `docker volume prune`
+The ``docker image prune`` command allows you to clean up unused images. By default, docker image prune only cleans up dangling images. A dangling image is one that is not tagged and is not referenced by any container. To remove all _unused_ resources, resources that are not directly used by any existing containers, use the `-a` switch as well.
+
 ## 04 - A basic Webserver
 Pull down the `nginx` Docker image from the Docker Hub. This Docker image uses the [Nginx](http://nginx.org/) webserver to serve a static HTML website.
 

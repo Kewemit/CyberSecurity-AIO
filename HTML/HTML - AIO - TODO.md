@@ -128,14 +128,14 @@ HTML attributes provide additional information about HTML elements.
 * Attributes provide additional information about elements.
 * Attributes are always specified in **the start tag**.
 * Attributes usually come in name/value pairs, like: name="value".
-## The href Attribute
+## href 
 The `<a>` tag defines a hyperlink. The `href` attribute specifies the **URL** of the page that the link points to:
 ```html
 <a href="https://google.com/">Visit Google</a>
 ```
 >[!important] **Notice** how the `href` is inside the start tag.
 More about links: [[HTML - AIO - TODO#HTML Links]]
-## The src Attribute
+## src 
 The `<img>` tag is used to embed an image in an HTML page. The `src` attribute specifies the path to the image to be displayed:
 ```html
 <img src="my_photo.png">
@@ -145,22 +145,22 @@ The `<img>` tag is used to embed an image in an HTML page. The `src` attribute s
 >[!important] **Note**, that you can't control external images, as they can suddenly be removed or changed.
 * **Relative URL**: Links to an image that is hosted **within the website**. Here, the URL doesn't include the domain name. If the URL begins without a slash (`/`), it will be relative to the current page. **Example**: `src="myphoto.png"`. If the URL begin with a slash, it will be relative to the domain. **Example**: `src="/images/myphoto.png"`.
 **Tip**: It's advised to almost always use relative URLs, as they don't break on domain change.
-## The width And height Attributes.
+## width And height
 The `<img>` tag should also contain the `width` and `height` attributes, which specify the width and height of the image (**in pixels**):
 ```html
 <img src="myphoto.png" width="500" height="600">
 ```
-## The alt Attribute
+## alt 
 The **required** `alt` attribute for the `<img>` tag specifies the alternate text for an image, if the image for some reason cannot be displayed. This can be due to a slow connection, the user using a screen reader, or an error in the `src` attribute:
 ```html
 <img src="myphoto.png" alt="My very cool photo">
 ```
-## The style Attribute
+## style 
 The `style` attribute is used to **add styles to an element**, such as **colour, font, size**, and more.
 ```html
 <p style="color:red;">This is a red Paragraph.</p>
 ```
-## The lang Attribute
+## lang 
 You should always include the `lang` attribute inside the `<html>` tag, to declare the language of the Web page. This is meant to assist search engines and browsers.
 
 The following example specifies **English** as the language:
@@ -183,7 +183,7 @@ The following example specifies English as the language and United States as the
 </body>
 </html>
 ```
-## The title Attribute
+## title 
 The `title` attribute defines some extra information about an element. The value of the `title` attribute will be displayed as a **tooltip** when the mouse if hovered over the element:
 ```html
 <p title="I'm a tooltip">This is a paragraph.</p>
@@ -197,7 +197,35 @@ The `title` attribute defines some extra information about an element. The value
 - The `style` attribute is used to **add styles to an element, such as colour, font, size, and more**.
 - The `lang` attribute of the `<html>` tag **declares the language of the Web page**.
 - The `title` attribute **defines some extra information about an element**.
+# HTML Events 
+## THIS IS TODO
+https://www.w3schools.com/jsreF/event_onerror.asp
+## Media Events
+### onerror
+Execute a JavaScript if an error occurs when loading an image:
+```html
+<img src="image.gif" onerror="myfunction()">
+```
+The ``onerror`` event is triggered if an error occurs while loading an external file (e.g. a document or an image).
 
+The ``onerror`` attribute can be used on the following elements:
+
+| `<audio>`  |
+| ---------- |
+| `<body>`   |
+| `<embed>`  |
+| `<img>`    |
+| `<link>`   |
+| `<object>` |
+| `<script>` |
+| `<video>`  |
+
+>[!tip]
+>When used on **audio/video media**, related events that occurs when there is some kind of disturbance to the media loading process, are:
+>* onabort
+>* onemptied
+>* onstalled
+>* onsuspend
 # HTML Headings
 HTML headings are titles or subtitles that you want to display on a webpage. 
 * HTML headings are defined with the `<h1>` to `<h6>` tags.

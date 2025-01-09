@@ -4,14 +4,20 @@
   
 - [ ] Separate notes (like Command injection Thorough has subcategories like OS command injection etc instead of all in one same note.) ❌
 
-- [ ] Make a link page (see [[Linking example]])
+- [ ] Make a link page (see [[Linking example]]) ❌
 
-- [ ] Add TLDR section to all the Advent of Cyber Sections (est. 23% complete)
+- [ ] Add TLDR section to all the Advent of Cyber Sections (est. 23% complete) ❌
 
-- [ ] Finish HTML AIO
+- [ ] Finish HTML AIO ❌ 
 
-- [ ] Finish Docker AIO
+- [ ] Finish Docker AIO ❌
 
-- [x] Finish Linux permission Cheatsheet
-- [ ] Finish HTML Tag Cheatsheet
+- [x] Finish Linux permission Cheatsheet ✅
+
+- [ ] Finish HTML Tag Cheatsheet ❌
+
+- [ ] PowerShell Notes ❌ 
+
+- [ ] SQLi HackMD photos to obsidian ❌
+
 

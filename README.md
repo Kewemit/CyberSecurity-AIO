@@ -7,7 +7,6 @@ My notes were originally written in [HackMD](https://hackmd.io) where i ported t
 
 > [!NOTE]
 > **Windows Defender might mark this as a virus since it contains examples of malicious commands (i.e. reverse shells), so you might have to exclude this project from your AV's scope.**
-
 ## Why This Repository Exists
 I made this repository to document my journey and provide useful information I could come back to anytime. It's meant to:
 - Serve as my knowledge base.
@@ -68,12 +67,18 @@ Here are some external resources you may find helpful:
 - [Hack The Box](https://www.hackthebox.com/)
 - [TryHackMe](https://tryhackme.com/)
 - [Cisco NetAcad](https://www.netacad.com/)
-
+**CTF**:
+[CTFlearn](https://ctflearn.com/challenge/1/browse) - CTF 
+[PicoCTF](https://play.picoctf.org/practice) - CTF
+[VulnHub](https://www.vulnhub.com/) - Vulnerable Machines
+[Root-Me](https://www.root-me.org/?lang=en) - CTF
+[Ringzer0](https://ringzer0ctf.com/) - CTF
+[CTF101](https://ctf101.org/) - CTF
+[Battleh4ck](https://seela.io/battleh4ck/) - PvP & PvE CTF
+For more see: [CTFSites](https://ctfsites.github.io/)
 ## ♻️TBA
 - Current est. for porting the **base** layer of all the notes: `02/2025`
-- Github Page
+- GitHub Page
 - Make GitHub friendly notes
-
 ## Disclaimer
-
 This repository is intended for **educational purposes only**. The techniques and tools discussed here should only be used in ethical hacking scenarios with proper authorization. Misuse of this knowledge can lead to severe consequences. Always practice responsible and ethical behaviour.

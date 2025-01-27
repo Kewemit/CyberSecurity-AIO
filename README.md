@@ -34,7 +34,7 @@ I made this repository to document my journey and provide useful information I c
 - Recon & Enumeration ♻️
 - Exploitation Techniques ♻️
 - Post-Exploitation ♻️
-- Shellcode Basics ♻️
+- Shellcode Basics ❌
 - Using PowerShell & Windows API ♻️
 - Evading Defenders & Bypassing AV ♻️
 - Network Penetration Testing ♻️
@@ -56,6 +56,7 @@ I made this repository to document my journey and provide useful information I c
 - C#❌
 - Python❌
 - Network(ing)♻️ (not yet uploaded to github)
+- Cheat Engine (Game Hacking) ♻️
 
 ♻️ = W.I.P
 ✅ = Completed

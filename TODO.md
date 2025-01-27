@@ -19,5 +19,7 @@
 - [ ] PowerShell Notes ❌ 
 
 - [ ] SQLi HackMD photos to obsidian ❌
+- [ ] Server Side Injection photos to obsidian ❌
+- [ ] Add references to [[Web Attacks - AIO]]❌
 
 

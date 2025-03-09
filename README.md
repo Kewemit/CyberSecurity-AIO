@@ -78,7 +78,7 @@ Here are some external resources you may find helpful:
 [Battleh4ck](https://seela.io/battleh4ck/) - PvP & PvE CTF
 For more see: [CTFSites](https://ctfsites.github.io/)
 ## ♻️TBA
-- Current est. for porting the **base** layer of all the notes: `02/2025`
+- Current est. for porting the **base** layer of all the notes: `11/2025`
 - GitHub Page
 - Make GitHub friendly notes
 ## Disclaimer
